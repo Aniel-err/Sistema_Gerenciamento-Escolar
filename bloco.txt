@@ -1,1 +1,0 @@
-mongodb+srv://lucaslviana07_db_user:jumento123@cluster0.zmpci15.mongodb.net/?appName=Cluster0
