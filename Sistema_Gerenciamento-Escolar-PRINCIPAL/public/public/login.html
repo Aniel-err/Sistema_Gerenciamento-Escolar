@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Login - Educação</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Bem-vindo de Volta!</h2>
+        </div>
+
+        <div id="message-container"></div>
+
+        <form id="formLogin" novalidate>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" required>
+                <span class="icon-check">&#10003;</span>
+            </div>
+
+            <div class="input-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" name="senha" placeholder="••••••••••••" required>
+            </div>
+
+            <div class="forgot-password">
+                <a href="#">Esqueceu a senha?</a>
+            </div>
+
+            <button type="submit" class="sign-in-button">Entrar</button>
+        </form>
+
+        <div class="sign-up-link">
+            Não tem uma conta? <a href="register.html">Cadastre-se</a>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>

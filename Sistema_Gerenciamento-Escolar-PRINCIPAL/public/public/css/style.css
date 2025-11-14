@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e0f2f7, #bbdefb); 
+}
+
+/* Estilo unificado para os contêineres de login e registro */
+.login-container,
+.register-container {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.login-header h2,
+.register-header h2 {
+    font-size: 2.2em;
+    margin-bottom: 30px;
+    color: #3f51b5; 
+    font-weight: 700;
+}
+
+/* --- CSS DAS MENSAGENS (Para ambas as páginas) --- */
+#message-container {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: left;
+    border: 1px solid transparent;
+    display: none; 
+}
+
+.message.success {
+    background-color: #e6f7e7; 
+    border-color: #4CAF50;
+    color: #388e3c;
+    display: block;
+}
+
+.message.error {
+    background-color: #fdecea; 
+    border-color: #f44336;
+    color: #d32f2f; 
+    display: block; 
+}
+
+/* --- Grupos de Input (Para ambas as páginas) --- */
+.input-group {
+    margin-bottom: 25px;
+    text-align: left;
+    position: relative;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #6a737b;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.input-group input {
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: #4CAF50;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.input-group .icon-check {
+    position: absolute;
+    right: 10px;
+    top: 40px;
+    color: #4CAF50;
+    font-size: 1.2em;
+    display: none;
+}
+
+/* Botões (Para ambas as páginas) */
+.sign-in-button,
+.submit-button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 5px 15px rgba(0, 150, 0, 0.2);
+}
+
+.sign-in-button:hover,
+.submit-button:hover {
+    background: linear-gradient(90deg, #8BC34A, #4CAF50);
+    transform: translateY(-2px);
+}
+
+/* Links (Para ambas as páginas) */
+.forgot-password {
+    text-align: right;
+    margin-top: -15px;
+    margin-bottom: 25px;
+}
+
+.forgot-password a {
+    color: #2196F3;
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+    color: #1976D2;
+}
+
+.sign-up-link,
+.sign-in-link {
+    margin-top: 30px;
+    font-size: 0.95em;
+    color: #6a737b;
+}
+
+.sign-up-link a,
+.sign-in-link a {
+    color: #2196F3;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.sign-up-link a:hover,
+.sign-in-link a:hover {
+    color: #1976D2;
+}

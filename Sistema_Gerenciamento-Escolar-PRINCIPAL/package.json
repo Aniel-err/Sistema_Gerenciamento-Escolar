@@ -1,0 +1,21 @@
+{
+  "name": "sistema_gerenciamento-escolar-main",
+  "version": "1.0.0",
+  "description": "Sistema de gestão escolar focado na organização de turmas, notas e comunicação entre professores, alunos e responsáveis.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.3"
+  }
+}
