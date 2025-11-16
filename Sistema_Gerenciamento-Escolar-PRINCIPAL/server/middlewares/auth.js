@@ -1,14 +1,17 @@
 const jwt = require("jsonwebtoken");
 
 function auth(req, res, next) {
-  const token = req.headers.authorization;
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
+  if (!authHeader) {
     return res.status(401).json({ erro: "Token não fornecido" });
   }
 
+  // Pega somente o token (remove o "Bearer ")
+  const token = authHeader.replace("Bearer ", "");
+
   try {
-    const decoded = jwt.verify(token, "SENHA_SECRETA");
+    const decoded = jwt.verify(token, "segredo123"); // <-- MESMA CHAVE DO LOGIN
     req.user = decoded;
     next();
   } catch (error) {
