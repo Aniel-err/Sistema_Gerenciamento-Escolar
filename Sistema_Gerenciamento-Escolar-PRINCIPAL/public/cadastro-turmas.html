@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Turmas - EduGest</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">EduGest</span>
+                <span class="system-name">Sistema de Gestão Escolar</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="home.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-users"></i> Alunos & Funcionários</a></li>
+                    <li><a href="#"><i class="fas fa-book"></i> Sistema de Notas</a></li>
+                    <li><a href="frequencia.html"><i class="fas fa-clipboard-list"></i> Frequência</a></li>
+                    <li><a href="#"><i class="fas fa-award"></i> Boletins</a></li>
+                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                    <li><a href="cadastro-turmas.html" class="active"><i class="fas fa-chalkboard"></i> Cad. Turmas</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="navbar">
+                <div class="navbar-left">
+                    <h1 class="page-title">Cadastro de Turmas</h1>
+                </div>
+                <div class="navbar-right">
+                    
+<button class="btn btn-primary" id="open-turma-modal-button"><i class="fas fa-plus"></i> Nova Turma</button>
+                </div>
+            </header>
+
+            
+<div class="card full-height-card">
+                
+<div class="tab-navigation">
+                    <button class="tab-link active" data-tab="tab-ativas">Turmas Ativas (3)</button>
+                    <button class="tab-link" data-tab="tab-inativas">Turmas Inativas (1)</button>
+                </div>
+
+                
+<div class="tab-content active" id="tab-ativas">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome da Turma</th>
+                                    <th>Série/Ano</th>
+                                    <th>Turno</th>
+                                    <th>Nº de Alunos</th>
+                                    <th>Professor(a) Regente</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>9º Ano A</td>
+                                    <td>9º Ano</td>
+                                    <td>Manhã</td>
+                                    <td>32</td>
+                                    <td>Maria Souza</td>
+                                    <td><button class="btn-action btn-edit"><i class="fas fa-edit"></i></button> <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>8º Ano B</td>
+                                    <td>8º Ano</td>
+                                    <td>Manhã</td>
+                                    <td>29</td>
+                                    <td>João Carlos</td>
+                                    <td><button class="btn-action btn-edit"><i class="fas fa-edit"></i></button> <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>7º Ano C</td>
+                                    <td>7º Ano</td>
+                                    <td>Tarde</td>
+                                    <td>30</td>
+                                    <td>Ana Beatriz</td>
+                                    <td><button class="btn-action btn-edit"><i class="fas fa-edit"></i></button> <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                
+<div class="tab-content" id="tab-inativas">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome da Turma</th>
+                                    <th>Série/Ano</th>
+                                    <th>Turno</th>
+                                    <th>Ano de Conclusão</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>9º Ano A (2024)</td>
+                                    <td>9º Ano</td>
+                                    <td>Manhã</td>
+                                    <td>2024</td>
+                                    <td><button class="btn-action btn-view"><i class="fas fa-eye"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    
+<div class="modal-overlay" id="turma-modal-overlay">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2>Nova Turma</h2>
+                <button class="close-modal-button" id="close-turma-modal-button">&times;</button>
+            </header>
+            <form id="turma-form" class="modal-form">
+                <div class="form-group">
+                    <label for="nome-turma">Nome da Turma</label>
+                    <input type="text" id="nome-turma" class="form-input" placeholder="Ex: 9º Ano A" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="serie-ano">Série/Ano</label>
+                        <select id="serie-ano" class="form-input" required>
+                            <option value="">Selecione...</option>
+                            <option value="6">6º Ano</option>
+                            <option value="7">7º Ano</option>
+                            <option value="8">8º Ano</option>
+                            <option value="9">9º Ano</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="turno">Turno</label>
+                        <select id="turno" class="form-input" required>
+                            <option value="">Selecione...</option>
+                            <option value="manha">Manhã</option>
+                            <option value="tarde">Tarde</option>
+                            <option value="integral">Integral</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="professor-regente">Professor(a) Regente</label>
+                    <select id="professor-regente" class="form-input">
+                        <option value="">Selecione...</option>
+                        <option value="1">Maria Souza</option>
+                        <option value="2">João Carlos</option>
+                        <option value="3">Ana Beatriz</option>
+                    </select>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-turma-modal-button">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Turma</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+<script src="js/cadastro-turmas.js"></script>
+</body>
+</html>
