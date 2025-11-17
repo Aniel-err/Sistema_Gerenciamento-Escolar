@@ -1,4 +1,3 @@
-// server/models/Usuario.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -18,28 +17,14 @@ const UsuarioSchema = new mongoose.Schema(
     /* ==================================================
        🔹 VERIFICAÇÃO DE EMAIL
     ================================================== */
-    emailVerificado: {
-      type: Boolean,
-      default: false
-    },
-
-    tokenVerificacao: {
-      type: String,
-      default: null
-    },
+    emailVerificado: { type: Boolean, default: false },
+    tokenVerificacao: { type: String, default: null },
 
     /* ==================================================
-       🔹 RECUPERAÇÃO DE SENHA (PADRONIZADO)
+       🔹 RECUPERAÇÃO DE SENHA
     ================================================== */
-    resetPasswordToken: {
-      type: String,
-      default: null
-    },
-
-    resetPasswordExpires: {
-      type: Date,
-      default: null
-    }
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null }
   },
   { 
     versionKey: false,
@@ -62,7 +47,12 @@ UsuarioSchema.pre('save', async function (next) {
 /* ==================================================
    🔍 Método para verificar senha
 ================================================== */
-UsuarioSchema.methods.verificarSenha = function (senhaDigitada) {
+UsuarioSchema.methods.verificarSenha = async function (senhaDigitada) {
+  // Se a senha não estiver carregada (select:false), busca do DB
+  if (!this.senha) {
+    const usuario = await this.constructor.findById(this._id).select('+senha');
+    return bcrypt.compare(senhaDigitada, usuario.senha);
+  }
   return bcrypt.compare(senhaDigitada, this.senha);
 };
 

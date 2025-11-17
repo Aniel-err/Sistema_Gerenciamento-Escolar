@@ -53,7 +53,7 @@ router.post("/login", async (req, res) => {
 });
 
 /* =======================================================
-   📩 PEDIR RECUPERAÇÃO DE SENHA
+   📩 ESQUECI MINHA SENHA
 ======================================================= */
 router.post("/forgot-password", async (req, res) => {
     const { email } = req.body;
@@ -88,26 +88,58 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 /* =======================================================
-   🔑 RESETAR SENHA (POST)
+   🔑 FORMULÁRIO PARA REDIFINIR SENHA (GET)
 ======================================================= */
-router.post("/reset-password/:token", async (req, res) => {
+router.get("/reset-password/:token", async (req, res) => {
     const { token } = req.params;
-    const { novaSenha } = req.body;
 
     try {
-        console.log("\n=== ROTA RESET PASSWORD ACIONADA ===");
-        console.log("Token recebido:", token);
+        const usuario = await Usuario.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
 
+        if (!usuario) {
+            return res.send("❌ Token inválido ou expirado!");
+        }
+
+        // HTML simples com método POST correto
+        res.send(`
+            <h2>Redefinir Senha</h2>
+            <form action="/auth/reset-password/${token}" method="POST">
+                <input type="password" name="novaSenha" placeholder="Nova senha" required />
+                <button type="submit">Alterar senha</button>
+            </form>
+        `);
+
+    } catch (error) {
+        console.error("Erro GET /reset-password:", error);
+        res.status(500).send("Erro ao carregar a página de redefinição de senha.");
+    }
+});
+
+/* =======================================================
+   🔑 REDIFINIR SENHA (POST)
+======================================================= */
+router.post("/reset-password/:token", async (req, res) => {
+    const token = req.params.token;
+    const novaSenha = req.body.novaSenha; // Garantido que vem do form HTML
+
+    // Log para depuração
+    console.log("req.body:", req.body);
+
+    if (!novaSenha) {
+        return res.status(400).send("❌ Nova senha não fornecida!");
+    }
+
+    try {
         const usuario = await Usuario.findOne({
             resetPasswordToken: token,
             resetPasswordExpires: { $gt: Date.now() }
         }).select("+senha");
 
-        console.log("Usuário encontrado:", usuario ? usuario.email : "NÃO ENCONTRADO");
-        console.log("====================================\n");
-
         if (!usuario) {
-            return res.status(400).json({ mensagem: "❌ Token inválido ou expirado!" });
+            return res.status(400).send("❌ Token inválido ou expirado!");
         }
 
         usuario.senha = novaSenha; // será criptografada pelo pre('save')
@@ -116,15 +148,12 @@ router.post("/reset-password/:token", async (req, res) => {
 
         await usuario.save();
 
-        return res.json({ mensagem: "🔑 Senha alterada com sucesso!" });
+        return res.send("🔑 Senha alterada com sucesso! Você já pode fazer login com a nova senha.");
 
     } catch (error) {
         console.error("Erro /reset-password:", error);
-        return res.status(500).json({ mensagem: "Erro ao redefinir a senha." });
+        return res.status(500).send("Erro ao redefinir a senha.");
     }
 });
 
-/* =======================================================
-   EXPORT
-======================================================= */
 module.exports = router;

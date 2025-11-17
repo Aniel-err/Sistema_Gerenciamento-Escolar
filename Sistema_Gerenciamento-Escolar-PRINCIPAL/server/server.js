@@ -11,12 +11,19 @@ const professorRoutes = require("./routes/professorRoutes");
 
 const app = express();
 
+// Permite receber JSON no corpo das requisições
 app.use(express.json());
+
+// Permite receber dados de formulários HTML (application/x-www-form-urlencoded)
+app.use(express.urlencoded({ extended: true }));
+
+// Permite requisições de outros domínios
 app.use(cors());
 
 // TORNA A PASTA /public ACESSÍVEL
 app.use(express.static(path.join(__dirname, "../public")));
 
+// Conecta no banco
 connect();
 
 // Rotas da API
