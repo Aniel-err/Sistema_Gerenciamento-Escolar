@@ -4,26 +4,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageContainer = document.getElementById('message-container');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm-password');
-    const nome = document.getElementById('fullname'); // Pegando o nome
-    const email = document.getElementById('email'); // Pegando o email
+    const nome = document.getElementById('fullname');
+    const email = document.getElementById('email');
 
     registerForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         messageContainer.innerHTML = '';
 
-        // Validação básica do frontend
+        // --- VALIDAÇÕES ---
         if (password.value !== confirmPassword.value) {
-            showMessage('As senhas não coincidem. Tente novamente.', 'error');
+            showMessage('As senhas não coincidem.', 'error');
             return;
         }
-        if (password.value.length < 6) { // (Opcional)
+
+        if (password.value.length < 6) {
             showMessage('A senha deve ter no mínimo 6 caracteres.', 'error');
             return;
         }
 
-        // --- CONEXÃO COM O BACKEND ---
+        // --- ENVIO PARA O BACKEND ---
         try {
-            // 1. Chama a rota /auth/register
             const response = await fetch('http://localhost:3000/auth/register', {
                 method: 'POST',
                 headers: {
@@ -33,29 +33,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     nome: nome.value,
                     email: email.value,
                     senha: password.value
-                    // O 'tipo' (role) será 'aluno' por padrão, como definido no backend
                 })
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                // SUCESSO!
-                showMessage(data.mensagem + ' Você já pode fazer o login.', 'success');
+                // SUCESSO - USUÁRIO CRIADO E E-MAIL DE VERIFICAÇÃO FOI ENVIADO
+                showMessage(
+                    "Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.",
+                    'success'
+                );
+
                 registerForm.reset();
             } else {
-                // ERRO (Ex: "Usuário já cadastrado")
+                // ERRO DO SERVIDOR (ex: "Email já cadastrado")
                 showMessage(data.mensagem, 'error');
             }
 
         } catch (error) {
             console.error('Erro de rede:', error);
-            showMessage('Erro ao conectar com o servidor. Tente mais tarde.', 'error');
+            showMessage('Não foi possível conectar ao servidor.', 'error');
         }
-        // -----------------------------
     });
 
-    // Função auxiliar para exibir a mensagem
+    // Função para exibir mensagens
     function showMessage(messageText, messageType) {
         const messageElement = document.createElement('div');
         messageElement.className = 'message ' + messageType;

@@ -6,37 +6,56 @@ const UsuarioSchema = new mongoose.Schema(
   {
     nome: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
-    senha: { type: String, required: true, select: false }, // 'select: false' é uma boa prática
+
+    senha: { type: String, required: true, select: false },
+
     tipo: {
       type: String,
       enum: ['aluno', 'professor', 'coordenador', 'admin'],
       default: 'aluno'
     },
-    
-    // --- ADICIONADO PARA O "ESQUECER SENHA" ---
+
+    /* ==================================================
+       🔹 CAMPOS DE VERIFICAÇÃO DE EMAIL
+    ================================================== */
+    emailVerificado: {
+      type: Boolean,
+      default: false
+    },
+
+    tokenVerificacao: {
+      type: String,
+      default: null
+    },
+
+    /* ==================================================
+       🔹 CAMPOS DE RESETAR SENHA (já existiam)
+    ================================================== */
     resetToken: String,
     resetTokenExpiry: Date
-    // ----------------------------------------
-    
   },
   { 
     versionKey: false,
-    timestamps: true // Adiciona 'createdAt' e 'updatedAt'
+    timestamps: true
   }
 );
 
-// 🔐 Criptografa a senha automaticamente antes de salvar
+/* ==================================================
+   🔐 Criptografa a senha antes de salvar
+================================================== */
 UsuarioSchema.pre('save', async function (next) {
   if (!this.isModified('senha')) return next();
+
   const salt = await bcrypt.genSalt(10);
   this.senha = await bcrypt.hash(this.senha, salt);
+
   next();
 });
 
-// 🔍 Método para comparar senha
+/* ==================================================
+   🔍 Método para verificar senha
+================================================== */
 UsuarioSchema.methods.verificarSenha = function (senhaDigitada) {
-  // 'select: false' exige que a senha seja selecionada manualmente antes de comparar
-  // Mas no login/controller, você vai buscar o usuário com .select('+senha')
   return bcrypt.compare(senhaDigitada, this.senha);
 };
 

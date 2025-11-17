@@ -1,15 +1,15 @@
-// public/js/login.js
-
 document.addEventListener('DOMContentLoaded', function() {
     
-    // MUDADO DE 'login-form' PARA 'formLogin' PARA BATER COM SEU HTML
     const loginForm = document.getElementById('formLogin'); 
-    
     const messageContainer = document.getElementById('message-container');
     const email = document.getElementById('email');
-    
-    // Seu HTML tem o id="senha", então ajustamos aqui também
     const password = document.getElementById('senha'); 
+
+    // Modal e elementos internos
+    const modal = document.getElementById('modal-verificacao');
+    const closeModal = document.getElementById('close-modal');
+    const btnResend = document.getElementById('btn-resend');
+    const resendMessage = document.getElementById('resend-message');
 
     loginForm.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -18,9 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const emailValue = email.value;
         const passValue = password.value;
         
-        // --- CONEXÃO COM O BACKEND ---
         try {
-            // 1. Chama a rota /auth/login
             const response = await fetch('http://localhost:3000/auth/login', {
                 method: 'POST',
                 headers: {
@@ -28,27 +26,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     email: emailValue,
-                    senha: passValue // O backend espera 'senha'
+                    senha: passValue
                 })
             });
 
             const data = await response.json();
 
+            if (data.emailNaoVerificado === true) {
+                // Mostra o modal de reenvio de link
+                modal.style.display = 'flex';
+                return;
+            }
+
             if (response.ok) {
-                // SUCESSO!
                 showMessage(data.mensagem, 'success');
-                
-                // 2. Salva o token e os dados do usuário no navegador
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('usuario', JSON.stringify(data.usuario));
                 
-                // 3. Redireciona para o dashboard após 1 segundo
                 setTimeout(() => {
                     window.location.href = 'home.html';
                 }, 1000);
-
             } else {
-                // ERRO (Ex: "Senha incorreta!")
                 showMessage(data.mensagem, 'error');
             }
 
@@ -56,10 +54,47 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Erro de rede:', error);
             showMessage('Erro ao conectar com o servidor. Tente mais tarde.', 'error');
         }
-        // -----------------------------
     });
 
-    // Função auxiliar para exibir a mensagem
+    // Fechar modal
+    closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+        resendMessage.innerHTML = '';
+    });
+
+    // Clicar fora do modal fecha
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            resendMessage.innerHTML = '';
+        }
+    });
+
+    // Reenviar link de verificação
+    btnResend.addEventListener('click', async () => {
+        resendMessage.innerHTML = '';
+        try {
+            const response = await fetch('http://localhost:3000/auth/resend-verification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.value })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                resendMessage.textContent = "✅ Link reenviado! Verifique sua caixa de entrada.";
+                resendMessage.style.color = "green";
+            } else {
+                resendMessage.textContent = data.mensagem || "❌ Não foi possível reenviar.";
+                resendMessage.style.color = "red";
+            }
+        } catch (error) {
+            console.error(error);
+            resendMessage.textContent = "❌ Erro ao tentar reenviar o link.";
+            resendMessage.style.color = "red";
+        }
+    });
+
     function showMessage(messageText, messageType) {
         const messageElement = document.createElement('div');
         messageElement.className = 'message ' + messageType;
