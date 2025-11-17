@@ -16,7 +16,7 @@ const UsuarioSchema = new mongoose.Schema(
     },
 
     /* ==================================================
-       🔹 CAMPOS DE VERIFICAÇÃO DE EMAIL
+       🔹 VERIFICAÇÃO DE EMAIL
     ================================================== */
     emailVerificado: {
       type: Boolean,
@@ -29,10 +29,17 @@ const UsuarioSchema = new mongoose.Schema(
     },
 
     /* ==================================================
-       🔹 CAMPOS DE RESETAR SENHA (já existiam)
+       🔹 RECUPERAÇÃO DE SENHA (PADRONIZADO)
     ================================================== */
-    resetToken: String,
-    resetTokenExpiry: Date
+    resetPasswordToken: {
+      type: String,
+      default: null
+    },
+
+    resetPasswordExpires: {
+      type: Date,
+      default: null
+    }
   },
   { 
     versionKey: false,

@@ -2,139 +2,129 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-
 const Usuario = require("../models/Usuario");
-const enviarEmailVerificacao = require("../utils/enviarEmailVerificacao");
+const enviarEmailRecuperacao = require("../utils/enviarEmailRecuperacao");
 
 const SECRET = "segredo123";
 
 /* =======================================================
-   🧩 CADASTRO + ENVIO DE VERIFICAÇÃO DE EMAIL
+   🧩 CADASTRO
 ======================================================= */
 router.post("/register", async (req, res) => {
-  try {
-    const { nome, email, senha, tipo } = req.body;
-
-    const existente = await Usuario.findOne({ email });
-    if (existente) {
-      return res.status(400).json({ mensagem: "❌ E-mail já cadastrado!" });
+    try {
+        const usuario = await Usuario.create(req.body);
+        return res.json({ mensagem: "Usuário criado com sucesso!", usuario });
+    } catch (error) {
+        console.error("Erro /register:", error);
+        return res.status(500).json({ mensagem: "Erro ao cadastrar usuário." });
     }
-
-    const tokenVerificacao = crypto.randomBytes(32).toString("hex");
-
-    const novoUsuario = new Usuario({
-      nome,
-      email,
-      senha, // criptografado pelo schema
-      tipo: tipo || "aluno",
-      emailVerificado: false,
-      tokenVerificacao
-    });
-
-    await novoUsuario.save();
-
-    await enviarEmailVerificacao(email, tokenVerificacao);
-
-    return res.status(201).json({
-      mensagem: "✅ Conta criada! Verifique seu e-mail para ativar sua conta."
-    });
-  } catch (err) {
-    console.error("Erro /register:", err);
-    return res.status(500).json({ mensagem: "❌ Erro ao criar usuário." });
-  }
 });
 
 /* =======================================================
-   🔗 VERIFICAÇÃO DE EMAIL
-======================================================= */
-router.get("/verify/:token", async (req, res) => {
-  try {
-    const usuario = await Usuario.findOne({ tokenVerificacao: req.params.token });
-
-    if (!usuario) {
-      return res.status(400).send("❌ Token inválido ou usuário não encontrado.");
-    }
-
-    usuario.emailVerificado = true;
-    usuario.tokenVerificacao = null;
-    await usuario.save();
-
-    return res.send("✅ E-mail verificado com sucesso! Agora você pode fazer login.");
-  } catch (err) {
-    console.error("Erro /verify:", err);
-    return res.status(500).send("❌ Erro no servidor.");
-  }
-});
-
-/* =======================================================
-   🔁 REENVIAR LINK DE VERIFICAÇÃO
-======================================================= */
-router.post("/resend-verification", async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    const usuario = await Usuario.findOne({ email });
-    if (!usuario) {
-      return res.status(404).json({ mensagem: "❌ Usuário não encontrado!" });
-    }
-
-    if (usuario.emailVerificado) {
-      return res.status(400).json({ mensagem: "✅ E-mail já verificado." });
-    }
-
-    usuario.tokenVerificacao = crypto.randomBytes(32).toString("hex");
-    await usuario.save();
-
-    await enviarEmailVerificacao(email, usuario.tokenVerificacao);
-
-    return res.status(200).json({ mensagem: "✔ Link de verificação reenviado!" });
-  } catch (err) {
-    console.error("Erro /resend-verification:", err);
-    return res.status(500).json({ mensagem: "❌ Erro ao reenviar o link." });
-  }
-});
-
-/* =======================================================
-   🔐 LOGIN COM VERIFICAÇÃO
+   🔐 LOGIN
 ======================================================= */
 router.post("/login", async (req, res) => {
-  try {
     const { email, senha } = req.body;
-    const usuario = await Usuario.findOne({ email }).select("+senha");
 
-    if (!usuario) {
-      return res.status(400).json({ error: "❌ Usuário não encontrado!" });
+    try {
+        const usuario = await Usuario.findOne({ email }).select("+senha");
+        if (!usuario) return res.status(400).json({ mensagem: "Usuário não encontrado." });
+
+        const senhaValida = await usuario.verificarSenha(senha);
+        if (!senhaValida) return res.status(400).json({ mensagem: "Senha incorreta." });
+
+        const token = jwt.sign({ id: usuario._id }, SECRET, { expiresIn: "7d" });
+
+        return res.json({
+            mensagem: "Login realizado!",
+            token,
+            usuario: {
+                id: usuario._id,
+                nome: usuario.nome,
+                email: usuario.email,
+                tipo: usuario.tipo
+            }
+        });
+
+    } catch (error) {
+        console.error("Erro /login:", error);
+        return res.status(500).json({ mensagem: "Erro ao fazer login." });
     }
-
-    if (!usuario.emailVerificado) {
-      return res.status(401).json({
-        emailNaoVerificado: true,
-        mensagem: "📩 Verifique seu e-mail antes de fazer login!"
-      });
-    }
-
-    const senhaCorreta = await usuario.verificarSenha(senha);
-    if (!senhaCorreta) {
-      return res.status(400).json({ error: "❌ Senha incorreta!" });
-    }
-
-    const token = jwt.sign(
-      { userId: usuario._id, nome: usuario.nome, tipo: usuario.tipo },
-      SECRET,
-      { expiresIn: "8h" }
-    );
-
-    usuario.senha = undefined;
-
-    return res.json({
-      mensagem: "✅ Login realizado!",
-      token,
-      usuario
-    });
-  } catch (err) {
-    console.error("Erro /login:", err);
-    return res.status(500).json({ error: "❌ Erro no login." });
-  }
 });
 
+/* =======================================================
+   📩 PEDIR RECUPERAÇÃO DE SENHA
+======================================================= */
+router.post("/forgot-password", async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const usuario = await Usuario.findOne({ email });
+
+        if (!usuario) {
+            return res.json({ mensagem: "📩 Se o e-mail existir, você receberá o link." });
+        }
+
+        const token = crypto.randomBytes(32).toString("hex");
+
+        usuario.resetPasswordToken = token;
+        usuario.resetPasswordExpires = Date.now() + 3600000; // 1 hora
+        await usuario.save();
+
+        const link = `http://localhost:3000/auth/reset-password/${token}`;
+        await enviarEmailRecuperacao(email, link);
+
+        console.log("\n=== RESET TOKEN GERADO ===");
+        console.log("Token:", token);
+        console.log("Expira em:", usuario.resetPasswordExpires);
+        console.log("==========================\n");
+
+        return res.json({ mensagem: "📩 Se o e-mail existir, você receberá o link." });
+
+    } catch (error) {
+        console.error("Erro /forgot-password:", error);
+        return res.status(500).json({ mensagem: "Erro ao enviar o e-mail." });
+    }
+});
+
+/* =======================================================
+   🔑 RESETAR SENHA (POST)
+======================================================= */
+router.post("/reset-password/:token", async (req, res) => {
+    const { token } = req.params;
+    const { novaSenha } = req.body;
+
+    try {
+        console.log("\n=== ROTA RESET PASSWORD ACIONADA ===");
+        console.log("Token recebido:", token);
+
+        const usuario = await Usuario.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        }).select("+senha");
+
+        console.log("Usuário encontrado:", usuario ? usuario.email : "NÃO ENCONTRADO");
+        console.log("====================================\n");
+
+        if (!usuario) {
+            return res.status(400).json({ mensagem: "❌ Token inválido ou expirado!" });
+        }
+
+        usuario.senha = novaSenha; // será criptografada pelo pre('save')
+        usuario.resetPasswordToken = null;
+        usuario.resetPasswordExpires = null;
+
+        await usuario.save();
+
+        return res.json({ mensagem: "🔑 Senha alterada com sucesso!" });
+
+    } catch (error) {
+        console.error("Erro /reset-password:", error);
+        return res.status(500).json({ mensagem: "Erro ao redefinir a senha." });
+    }
+});
+
+/* =======================================================
+   EXPORT
+======================================================= */
 module.exports = router;
