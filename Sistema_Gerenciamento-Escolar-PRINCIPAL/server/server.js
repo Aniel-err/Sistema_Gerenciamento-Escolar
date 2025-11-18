@@ -1,3 +1,6 @@
+// server.js
+require('dotenv').config();
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -10,6 +13,7 @@ const turmaRoutes = require("./routes/turmaRoutes");
 const professorRoutes = require("./routes/professorRoutes");
 const presencaRoutes = require("./routes/presencaRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const alunoRoutes = require("./routes/alunoRoutes"); // <--- NOVO!
 
 const app = express();
 
@@ -25,10 +29,13 @@ app.use("/auth", authRoutes);
 app.use("/materias", materiasRoutes);
 app.use("/turmas", turmaRoutes);
 app.use("/professores", professorRoutes);
+app.use("/alunos", alunoRoutes); // <--- NOVO!
 
 app.use("/api/presencas", presencaRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-app.listen(3000, () => {
-  console.log("🔥 API Unificada rodando na porta 3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🔥 API Unificada rodando na porta ${PORT}`);
 });

@@ -1,4 +1,4 @@
-// public/js/cadastro-turmas.js
+// public/js/cadastro-turmas.js (CORRIGIDO)
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -23,6 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
     let editMode = false;
     let editTurmaId = null;
 
+    // Função para tratar token inválido/ausente
+    function redirectToLogin(message) {
+        alert(message || 'Sessão expirada. Faça login novamente.');
+        localStorage.clear();
+        window.location.href = 'login.html';
+    }
+
     // --- LÓGICA DAS ABAS (Tabs) ---
     tabLinks.forEach(link => {
         link.addEventListener('click', function() {
@@ -42,14 +49,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeModal() {
         if (modalOverlay) modalOverlay.classList.remove('show');
         
-        // Limpa e reseta o modal ao fechar
         turmaForm.reset();
         modalTitle.textContent = "Nova Turma";
         editMode = false;
         editTurmaId = null;
     }
 
-    // Botão "Nova Turma" - reseta para modo de criação
     if (openModalButton) {
         openModalButton.addEventListener('click', () => {
             modalTitle.textContent = "Nova Turma";
@@ -71,8 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- CARREGAR DADOS DO BACKEND (READ) ---
     async function carregarTurmas() {
         if (!token) {
-             alert('Você não está logado.');
-             window.location.href = 'login.html';
+             redirectToLogin('Você não está logado.');
              return;
         }
 
@@ -84,10 +88,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Authorization': `Bearer ${token}` 
                 }
             });
+
+            if (response.status === 401) { // Trata token expirado/inválido
+                 redirectToLogin('Sessão expirada. Faça login novamente.');
+                 return;
+            }
+            
             if (!response.ok) { 
                 const erro = await response.json();
                 throw new Error(erro.mensagem || 'Erro ao buscar turmas.');
             }
+            
             const turmas = await response.json();
             renderizarTabelas(turmas);
         } catch (error) { 
@@ -107,9 +118,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            if (response.status === 401) return; // Se falhar, a tela principal vai tratar o erro
+
             if (!response.ok) throw new Error('Erro ao carregar professores');
             const professores = await response.json();
-            professorSelect.innerHTML = '<option value="">Selecione...</option>';
+            
+            // Adiciona a opção "Nenhum" (importante para limpar o professor regente)
+            professorSelect.innerHTML = '<option value="">Nenhum Professor</option>';
             professores.forEach(prof => {
                 const option = document.createElement('option');
                 option.value = prof._id;
@@ -117,8 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 professorSelect.appendChild(option);
             });
         } catch (error) { 
-            console.error('Erro:', error);
-            alert(error.message);
+            console.error('Erro ao carregar professores:', error);
         }
     }
 
@@ -130,15 +144,17 @@ document.addEventListener('DOMContentLoaded', function() {
         let contagemInativas = 0;
 
         turmas.forEach(turma => {
-            const nomeProfessor = turma.professores.length > 0 ? turma.professores[0].nome : 'Nenhum';
+            // Pega o nome do primeiro professor (Regente) se existir
+            const nomeProfessor = turma.professores && turma.professores.length > 0 
+                                  ? turma.professores[0].nome 
+                                  : 'Nenhum';
             
-            // --- A CORREÇÃO ESTÁ AQUI (class=) ---
             const linhaHtml = `
                 <tr>
                     <td>${turma.nome}</td>
                     <td>${turma.serie || turma.anoLetivo}</td>
                     <td>${turma.periodo}</td>
-                    <td>${turma.alunos.length}</td>
+                    <td>${turma.alunos ? turma.alunos.length : 0}</td> 
                     <td>${nomeProfessor}</td>
                     <td>
                         <button class="btn-action btn-edit" data-id="${turma._id}"><i class="fas fa-edit"></i></button>
@@ -146,7 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </td>
                 </tr>
             `;
-            // --- FIM DA CORREÇÃO ---
 
             if (turma.status === 'Ativa') {
                 tabelaAtivas.innerHTML += linhaHtml;
@@ -165,6 +180,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 contagemInativas++;
             }
         });
+        
+        // Atualiza a contagem das abas
         document.querySelector('.tab-link[data-tab="tab-ativas"]').textContent = `Turmas Ativas (${contagemAtivas})`;
         document.querySelector('.tab-link[data-tab="tab-inativas"]').textContent = `Turmas Inativas (${contagemInativas})`;
     }
@@ -176,15 +193,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const dadosTurma = {
                 nome: document.getElementById('nome-turma').value,
-                anoLetivo: "2025", 
+                // Usando o ano atual como default (se o campo não existir no HTML)
+                anoLetivo: new Date().getFullYear().toString(), 
                 serie: document.getElementById('serie-ano').value,
                 periodo: document.getElementById('turno').value,
-                professorRegenteId: professorSelect.value || null
+                // Envia null se "Nenhum Professor" for selecionado
+                professorRegenteId: professorSelect.value || null 
             };
 
             const url = editMode 
-                ? `http://localhost:3000/turmas/${editTurmaId}` // URL de Edição
-                : 'http://localhost:3000/turmas'; // URL de Criação
+                ? `http://localhost:3000/turmas/${editTurmaId}`
+                : 'http://localhost:3000/turmas';
             
             const method = editMode ? 'PUT' : 'POST';
 
@@ -199,6 +218,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 const data = await response.json();
+                
+                if (response.status === 401) {
+                    redirectToLogin('Sessão expirada. Faça login novamente.');
+                    return;
+                }
                 if (!response.ok) throw new Error(data.mensagem);
 
                 alert(data.mensagem);
@@ -226,7 +250,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     const data = await response.json();
+                    
+                    if (response.status === 401) {
+                         redirectToLogin('Sessão expirada. Faça login novamente.');
+                         return;
+                    }
                     if (!response.ok) throw new Error(data.mensagem);
+                    
                     alert(data.mensagem);
                     carregarTurmas();
                 } catch (error) {
@@ -247,14 +277,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                
+                if (response.status === 401) {
+                    redirectToLogin('Sessão expirada. Faça login novamente.');
+                    return;
+                }
                 if (!response.ok) throw new Error('Erro ao buscar dados da turma.');
+                
                 const turma = await response.json();
 
                 // 2. Preenche o modal
                 document.getElementById('nome-turma').value = turma.nome;
                 document.getElementById('serie-ano').value = turma.serie;
                 document.getElementById('turno').value = turma.periodo;
-                document.getElementById('professor-regente').value = turma.professores[0] || ""; 
+                // Preenche o professor regente, usando o ID do primeiro professor ou string vazia
+                document.getElementById('professor-regente').value = turma.professores.length > 0 ? turma.professores[0] : ""; 
                 
                 // 3. Configura o modo de edição e abre o modal
                 modalTitle.textContent = "Editar Turma";

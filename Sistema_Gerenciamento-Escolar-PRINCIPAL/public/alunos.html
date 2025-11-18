@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Pessoas - EduGest</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilo para o botão de toggle (Promover a coordenador) */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute; content: "";
+            height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #3f51b5; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        /* Esconde botão se não for admin */
+        .admin-only { display: none; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">EduGest</span>
+                <span class="system-name">Sistema de Gestão Escolar</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="home.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="alunos.html" class="active"><i class="fas fa-users"></i> Alunos & Funcionários</a></li>
+                    <li><a href="#"><i class="fas fa-book"></i> Sistema de Notas</a></li>
+                    <li><a href="frequencia.html"><i class="fas fa-clipboard-list"></i> Frequência</a></li>
+                    <li><a href="#"><i class="fas fa-award"></i> Boletins</a></li>
+                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                    <li><a href="cadastro-turmas.html"><i class="fas fa-chalkboard"></i> Cad. Turmas</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="navbar">
+                <div class="navbar-left">
+                    <h1 class="page-title">Gestão de Pessoas</h1>
+                </div>
+                <div class="navbar-right">
+                    <div id="btnContainer">
+                        </div>
+                </div>
+            </header>
+
+            <div class="card full-height-card" style="padding:0;">
+                
+                <div class="tab-navigation" style="padding: 0 20px; margin-top: 15px;">
+                    <button class="tab-link active" data-tab="tab-alunos">Alunos</button>
+                    <button class="tab-link" data-tab="tab-professores">Professores & Coordenadores</button>
+                </div>
+
+                <div class="tab-content active" id="tab-alunos" style="padding: 20px;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Matrícula</th>
+                                    <th>Nome</th>
+                                    <th>Turma</th>
+                                    <th>Responsável</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaAlunos"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-professores" style="padding: 20px;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Disciplina</th>
+                                    <th>Cargo (Coord?)</th>
+                                    <th class="admin-only-col">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaProfessores"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modalAluno">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2>Novo Aluno</h2>
+                <button class="close-modal-button" id="closeModalAluno">&times;</button>
+            </header>
+            <form id="formAluno" class="modal-form">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="nomeAluno" class="form-input" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Matrícula</label>
+                        <input type="text" id="matriculaAluno" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Turma</label>
+                        <select id="turmaSelect" class="form-input" required></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Responsável</label>
+                    <input type="text" id="responsavelAluno" class="form-input">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelModalAluno">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Aluno</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalProfessor">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2>Novo Professor</h2>
+                <button class="close-modal-button" id="closeModalProf">&times;</button>
+            </header>
+            <form id="formProfessor" class="modal-form">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="nomeProf" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Email (Login)</label>
+                    <input type="email" id="emailProf" class="form-input" required>
+                    <small style="color: #888;">Senha padrão: 123456</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" id="telProf" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Disciplina</label>
+                        <input type="text" id="discProf" class="form-input">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cargo Inicial</label>
+                    <select id="cargoProf" class="form-input">
+                        <option value="professor">Professor</option>
+                        <option value="coordenador">Coordenador</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelModalProf">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Professor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/alunos.js"></script>
+</body>
+</html>

@@ -1,12 +1,14 @@
+// server/controllers/dashboardController.js (CORRIGIDO - Consistência de Status)
 const Presenca = require("../models/Presenca");
 
 exports.getResumo = async (req, res) => {
     try {
         const total = await Presenca.countDocuments();
 
-        const presentes = await Presenca.countDocuments({ status: "Presente" });
-        const ausentes = await Presenca.countDocuments({ status: "Ausente" });
-        const atrasados = await Presenca.countDocuments({ status: "Atrasado" });
+        // 🚨 CORREÇÃO: Usando as letras minúsculas conforme o model Presenca.js
+        const presentes = await Presenca.countDocuments({ status: "presente" }); 
+        const ausentes = await Presenca.countDocuments({ status: "ausente" });
+        const atrasados = await Presenca.countDocuments({ status: "atrasado" });
 
         if (total === 0) {
             return res.json({
@@ -16,6 +18,7 @@ exports.getResumo = async (req, res) => {
             });
         }
 
+        // Calcula as porcentagens
         res.json({
             presentes: ((presentes / total) * 100).toFixed(1),
             ausentes: ((ausentes / total) * 100).toFixed(1),

@@ -1,27 +1,40 @@
+// server/utils/enviarEmailVerificacao.js
 const nodemailer = require("nodemailer");
 
+// 🚨 CORREÇÃO: Usando credenciais do arquivo .env
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+const EMAIL_HOST = process.env.EMAIL_HOST || "smtp.gmail.com";
+const EMAIL_PORT = process.env.EMAIL_PORT || 587;
+const EMAIL_SECURE = process.env.EMAIL_SECURE === 'true'; 
+
 async function enviarEmailVerificacao(email, token) {
+  if (!EMAIL_USER || !EMAIL_PASS) {
+      console.warn("⚠️ Credenciais de email não configuradas no .env. Email de verificação NÃO ENVIADO.");
+      return;
+  }
+    
   try {
-    // 1️⃣ Configuração do transportador Gmail
+    // 1️⃣ Configuração do transportador
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: EMAIL_HOST,
+      port: EMAIL_PORT,
+      secure: EMAIL_SECURE,
       auth: {
-        user: "projetoe81@gmail.com",   // seu e-mail Gmail
-        pass: "skve roue bgne zhql"        // use senha de app gerada no Gmail
+        user: EMAIL_USER,   
+        pass: EMAIL_PASS        
       }
     });
-
-    // Verifica se o transporter está OK
-    await transporter.verify();
-    console.log("✅ Transporter verificado com sucesso.");
 
     // 2️⃣ Link de verificação
     const link = `http://localhost:3000/auth/verify/${token}`;
     console.log(`🔗 Link de verificação gerado: ${link}`);
 
     // 3️⃣ Envia o e-mail
+    const remetente = `Sistema Escolar <${EMAIL_USER}>`;
+    
     const info = await transporter.sendMail({
-      from: "Sistema Escolar <projetoe81@gmail.com>",
+      from: remetente,
       to: email,
       subject: "Verifique seu e-mail",
       html: `
@@ -35,9 +48,13 @@ async function enviarEmailVerificacao(email, token) {
       `
     });
 
-    console.log(`✔ Email de verificação enviado! MessageId: ${info.messageId}`);
-  } catch (err) {
-    console.error("❌ Erro ao enviar email de verificação:", err);
+    console.log("Mensagem enviada: %s", info.messageId);
+
+    return { success: true };
+
+  } catch (error) {
+    console.error("Erro ao enviar e-mail de verificação:", error);
+    return { success: false, error: error.message };
   }
 }
 

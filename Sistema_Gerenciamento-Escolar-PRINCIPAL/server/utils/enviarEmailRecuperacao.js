@@ -1,18 +1,35 @@
 // server/utils/enviarEmailRecuperacao.js
 const nodemailer = require("nodemailer");
 
+// 🚨 CORREÇÃO: Usando credenciais do arquivo .env
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+const EMAIL_HOST = process.env.EMAIL_HOST || "smtp.gmail.com";
+const EMAIL_PORT = process.env.EMAIL_PORT || 587;
+// Converte a string 'true' para booleano, ou assume false se não estiver definido
+const EMAIL_SECURE = process.env.EMAIL_SECURE === 'true'; 
+
 async function enviarEmailRecuperacao(email, link) {
+  if (!EMAIL_USER || !EMAIL_PASS) {
+      console.warn("⚠️ Credenciais de email não configuradas no .env. Email de recuperação NÃO ENVIADO.");
+      return;
+  }
+  
   try {
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: EMAIL_HOST,
+      port: EMAIL_PORT,
+      secure: EMAIL_SECURE,
       auth: {
-        user: "projetoe81@gmail.com",
-        pass: "skve roue bgne zhql"  // ❗ SENHA DE APP, NÃO A SENHA NORMAL DO GMAIL
+        user: EMAIL_USER,
+        pass: EMAIL_PASS
       }
     });
 
+    const remetente = `Sistema Escolar <${EMAIL_USER}>`; 
+
     const mailOptions = {
-      from: "Sistema Escolar <projetoe81@gmail.com>",
+      from: remetente,
       to: email,
       subject: "🔑 Recuperação de senha",
       html: `
@@ -29,7 +46,6 @@ async function enviarEmailRecuperacao(email, link) {
 
   } catch (error) {
     console.error("Erro ao enviar e-mail de recuperação:", error);
-    throw error;
   }
 }
 
