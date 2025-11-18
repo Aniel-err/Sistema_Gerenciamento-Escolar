@@ -1,201 +1,185 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Frequência - EduGest</title>
-    <link rel="stylesheet" href="css/style.css">
-    
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Sistema de Presenças</title>
+
+    <!-- CSS embutido -->
+    <style>
+        body {
+            background: #1e1e1e;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* ---- TABS ---- */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            background: #2c2c2c;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tab.active {
+            background: #4a4a4a;
+        }
+
+        /* ---- CONTEÚDOS ---- */
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        /* ---- LISTA DE ALUNOS ---- */
+        #listaAlunos {
+            background: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .aluno-item {
+            padding: 10px;
+            background: #3a3a3a;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .aluno-item:hover {
+            background: #505050;
+        }
+
+        /* ---- DETALHES ---- */
+        #detalhesAluno {
+            background: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+            margin-top: 5px;
+            background: #3a3a3a;
+            color: white;
+        }
+
+        .btn {
+            padding: 10px 14px;
+            background: #3c3c3c;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background: #5a5a5a;
+        }
+
+        /* PAINEL */
+        #painel {
+            background: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        /* RELATÓRIO */
+        #relatorio {
+            background: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
-    <div class="dashboard-wrapper">
-        
-<aside class="sidebar">
-            <div class="sidebar-header">
-                <span class="logo">EduGest</span>
-                <span class="system-name">Sistema de Gestão Escolar</span>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="home.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                    <li><a href="#"><i class="fas fa-users"></i> Alunos & Funcionários</a></li>
-                    <li><a href="#"><i class="fas fa-book"></i> Sistema de Notas</a></li>
-                    <li><a href="frequencia.html" class="active"><i class="fas fa-clipboard-list"></i> Frequência</a></li>
-                    <li><a href="#"><i class="fas fa-award"></i> Boletins</a></li>
-                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
-                    <li><a href="cadastro-turmas.html"><i class="fas fa-chalkboard"></i> Cad. Turmas</a></li>
-                </ul>
-            </nav>
-            <div class="sidebar-stats">
-                <h3>ESTATÍSTICAS GERAIS</h3>
-                <div class="stat-card">
-                    <h4>Total de Alunos</h4>
-                    <p>1,247</p>
-                </div>
-            </div>
-        </aside>
 
-        
-<main class="main-content">
-            
-<header class="navbar">
-                <div class="navbar-left">
-                    <h1 class="page-title">Controle de Frequência</h1>
-                </div>
-                <div class="navbar-right">
-                    
-<div class="dropdown-container">
-                        <button class="icon-button" id="notification-button">
-                            <i class="fas fa-bell"></i>
-                            <span class="badge">2</span>
-                        </button>
-                        <div class="dropdown-menu" id="notification-dropdown">
-                            
+<h2>Sistema de Presenças</h2>
+
+<!-- TABS -->
+<div class="tabs">
+    <div class="tab active" data-tab="marcacao">Marcar Presença</div>
+    <div class="tab" data-tab="painel">Painel</div>
+    <div class="tab" data-tab="acompanhamento">Acompanhamento</div>
+    <div class="tab" data-tab="relatorio">Relatório Geral</div>
 </div>
-                    </div>
-                    
-                    <div class="dropdown-container">
-                        <button class="profile-button" id="profile-button">A</button>
-                        <div class="dropdown-menu" id="profile-dropdown">
-                            
+
+<!-- 1. Marcação -->
+<div class="content active" id="marcacao">
+    <h3>Alunos da Turma</h3>
+
+    <div id="listaAlunos"></div>
+
+    <div id="detalhesAluno" style="display:none;">
+        <h4 id="nomeAluno"></h4>
+
+        <button class="btn" data-status="presente">Presente</button>
+        <button class="btn" data-status="ausente">Ausente</button>
+        <button class="btn" data-status="atrasado">Atrasado</button>
+
+        <h4 style="margin-top: 20px;">Checklist</h4>
+        <label><input type="checkbox" id="uniforme"> Uniforme</label><br>
+        <label><input type="checkbox" id="material"> Material</label><br>
+        <label><input type="checkbox" id="comportamento"> Bom Comportamento</label>
+
+        <h4 style="margin-top: 15px;">Observação</h4>
+        <textarea id="observacao"></textarea>
+
+        <br><br>
+        <button class="btn" id="btnSalvar">Salvar Registro</button>
+    </div>
 </div>
-                    </div>
-                </div>
-            </header>
 
-            
-<div class="card full-height-card">
-                
-<div class="table-controls">
-                    <div class="control-group">
-                        <label for="filter-date">Data</label>
-                        <input type="date" id="filter-date" class="form-input">
-                    </div>
-                    <div class="control-group">
-                        <label for="filter-turma">Turma</label>
-                        <select id="filter-turma" class="form-input">
-                            <option value="">Todas</option>
-                            <option value="9a">9º Ano A</option>
-                            <option value="8b">8º Ano B</option>
-                            <option value="7c">7º Ano C</option>
-                        </select>
-                    </div>
-                    <div class="control-group">
-                        <label for="search-aluno">Buscar Aluno</label>
-                        <input type="text" id="search-aluno" class="form-input" placeholder="Nome ou Matrícula...">
-                    </div>
-                    <button class="btn btn-primary" id="open-modal-button"><i class="fas fa-plus"></i> Registrar Frequência</button>
-                </div>
+<!-- 2. Painel -->
+<div class="content" id="painel">
+    <h3>Painel da Turma</h3>
 
-                
-<div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox"></th>
-                                <th>Aluno</th>
-                                <th>Matrícula</th>
-                                <th>Turma</th>
-                                <th>Data</th>
-                                <th>Status</th>
-                                <th>Justificativa</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Ana Júlia Silva</td>
-                                <td>2025001</td>
-                                <td>9º Ano A</td>
-                                <td>16/11/2025</td>
-                                <td><span class="status-badge status-presente">Presente</span></td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Bruno Oliveira</td>
-                                <td>2025002</td>
-                                <td>8º Ano B</td>
-                                <td>16/11/2025</td>
-                                <td><span class="status-badge status-presente">Presente</span></td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Carlos Pereira</td>
-                                <td>2025003</td>
-                                <td>9º Ano A</td>
-                                <td>16/11/2025</td>
-                                <td><span class="status-badge status-falta">Falta</span></td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Daniela Costa</td>
-                                <td>2025004</td>
-                                <td>7º Ano C</td>
-                                <td>16/11/2025</td>
-                                <td><span class="status-badge status-falta">Falta</span></td>
-                                <td><span class="status-badge status-justificada">Justificada</span></td>
-                            </tr>
-                            
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-    </div>
+    <p>Presentes: <span id="painel-presentes">0%</span></p>
+    <p>Ausentes: <span id="painel-ausentes">0%</span></p>
+    <p>Atrasados: <span id="painel-atrasados">0%</span></p>
 
-    
-<div class="modal-overlay" id="frequency-modal-overlay">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h2>Registrar Frequência</h2>
-                <button class="close-modal-button" id="close-modal-button">&times;</button>
-            </header>
-            <form id="frequency-form" class="modal-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="aluno-select">Aluno</label>
-                        <select id="aluno-select" class="form-input" required>
-                            <option value="">Selecione o Aluno</option>
-                            <option value="2025001">Ana Júlia Silva</option>
-                            <option value="2025002">Bruno Oliveira</option>
-                            <option value="2025003">Carlos Pereira</option>
-                            <option value="2025004">Daniela Costa</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="data-registro">Data</label>
-                        <input type="date" id="data-registro" class="form-input" required>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Status</label>
-                    <div class="radio-group">
-                        <input type="radio" id="status-presente" name="status" value="presente" checked>
-                        <label for="status-presente">Presente</label>
-                        <input type="radio" id="status-falta" name="status" value="falta">
-                        <label for="status-falta">Falta</label>
-                    </div>
-                </div>
+    <div id="painelLista"></div>
+</div>
 
-                <div class="form-group">
-                    <label for="justificativa">Justificativa (opcional)</label>
-                    <textarea id="justificativa" class="form-input" rows="3" placeholder="Ex: Atestado médico..."></textarea>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="cancel-modal-button">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Registro</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<!-- 3. Acompanhamento -->
+<div class="content" id="acompanhamento">
+    <h3>Acompanhamento do Aluno</h3>
+    <textarea placeholder="Digite observações do aluno..."></textarea>
+    <br><br>
+    <button class="btn">Salvar Acompanhamento</button>
+</div>
 
-    <script src="js/home.js"></script> 
-<script src="js/frequencia.js"></script> 
+<!-- 4. Relatório -->
+<div class="content" id="relatorio">
+    <h3>Relatório de Presença</h3>
+    <p>Percentual total: <span id="percentual">0%</span></p>
+</div>
+
+<!-- Importação do JS -->
+<script src="js/presencas.js"></script>
+
 </body>
 </html>
