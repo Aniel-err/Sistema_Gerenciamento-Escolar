@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const email = document.getElementById('email');
     const password = document.getElementById('senha'); 
 
-    // Modal e elementos internos
+    // Modal elementos
     const modal = document.getElementById('modal-verificacao');
     const closeModal = document.getElementById('close-modal');
     const btnResend = document.getElementById('btn-resend');
@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         messageContainer.innerHTML = '';
 
-        const emailValue = email.value;
-        const passValue = password.value;
+        const emailValue = email.value.trim();
+        const passValue = password.value.trim();
         
         try {
             const response = await fetch('http://localhost:3000/auth/login', {
@@ -32,23 +32,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
 
-            if (data.emailNaoVerificado === true) {
-                // Mostra o modal de reenvio de link
+            /* ===========================================================
+               🔥 SE O EMAIL NÃO ESTÁ VERIFICADO → ABRE A MODAL
+            ============================================================ */
+            if (response.status === 401 && data.mensagem.includes("Email não verificado")) {
                 modal.style.display = 'flex';
                 return;
             }
 
+            /* ===========================================================
+               🔥 LOGIN OK
+            ============================================================ */
             if (response.ok) {
                 showMessage(data.mensagem, 'success');
+
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('usuario', JSON.stringify(data.usuario));
                 
                 setTimeout(() => {
                     window.location.href = 'home.html';
                 }, 1000);
-            } else {
-                showMessage(data.mensagem, 'error');
+
+                return;
             }
+
+            /* ===========================================================
+               ❌ OUTROS ERROS DE LOGIN
+            ============================================================ */
+            showMessage(data.mensagem, 'error');
+
 
         } catch (error) {
             console.error('Erro de rede:', error);
@@ -62,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resendMessage.innerHTML = '';
     });
 
-    // Clicar fora do modal fecha
+    // Clicar fora da modal fecha
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.style.display = 'none';

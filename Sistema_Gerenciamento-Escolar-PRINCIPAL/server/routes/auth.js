@@ -3,17 +3,31 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const Usuario = require("../models/Usuario");
+const enviarEmailVerificacao = require("../utils/enviarEmailVerificacao");
 const enviarEmailRecuperacao = require("../utils/enviarEmailRecuperacao");
 
 const SECRET = "segredo123";
 
 /* =======================================================
-   🧩 CADASTRO
+   🧩 CADASTRO COM VERIFICAÇÃO DE EMAIL
 ======================================================= */
 router.post("/register", async (req, res) => {
     try {
         const usuario = await Usuario.create(req.body);
-        return res.json({ mensagem: "Usuário criado com sucesso!", usuario });
+
+        // Gera token de verificação
+        const tokenVerificacao = crypto.randomBytes(32).toString("hex");
+        usuario.tokenVerificacao = tokenVerificacao;
+        usuario.emailVerificado = false;
+        await usuario.save();
+
+        // Envia email de verificação
+        await enviarEmailVerificacao(usuario.email, tokenVerificacao);
+
+        return res.json({
+            mensagem: "Usuário criado! Verifique seu email para ativar a conta.",
+            usuario
+        });
     } catch (error) {
         console.error("Erro /register:", error);
         return res.status(500).json({ mensagem: "Erro ao cadastrar usuário." });
@@ -21,7 +35,7 @@ router.post("/register", async (req, res) => {
 });
 
 /* =======================================================
-   🔐 LOGIN
+   🔐 LOGIN BLOQUEANDO USUÁRIOS NÃO VERIFICADOS
 ======================================================= */
 router.post("/login", async (req, res) => {
     const { email, senha } = req.body;
@@ -32,6 +46,10 @@ router.post("/login", async (req, res) => {
 
         const senhaValida = await usuario.verificarSenha(senha);
         if (!senhaValida) return res.status(400).json({ mensagem: "Senha incorreta." });
+
+        if (!usuario.emailVerificado) {
+            return res.status(401).json({ mensagem: "📧 Email não verificado. Verifique seu email!" });
+        }
 
         const token = jwt.sign({ id: usuario._id }, SECRET, { expiresIn: "7d" });
 
@@ -49,6 +67,55 @@ router.post("/login", async (req, res) => {
     } catch (error) {
         console.error("Erro /login:", error);
         return res.status(500).json({ mensagem: "Erro ao fazer login." });
+    }
+});
+
+/* =======================================================
+   📧 VERIFICAÇÃO DE EMAIL
+======================================================= */
+router.get("/verify/:token", async (req, res) => {
+    const { token } = req.params;
+
+    try {
+        const usuario = await Usuario.findOne({ tokenVerificacao: token });
+        if (!usuario) return res.send("❌ Token inválido ou expirado!");
+
+        usuario.emailVerificado = true;
+        usuario.tokenVerificacao = null;
+        await usuario.save();
+
+        res.send("✔ Email verificado com sucesso! Você já pode fazer login.");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Erro ao verificar email.");
+    }
+});
+
+/* =======================================================
+   🔁 REENVIAR LINK DE VERIFICAÇÃO
+======================================================= */
+router.post("/resend-verification", async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const usuario = await Usuario.findOne({ email });
+        if (!usuario) return res.status(400).json({ mensagem: "Usuário não encontrado." });
+
+        if (usuario.emailVerificado) {
+            return res.status(400).json({ mensagem: "Email já verificado." });
+        }
+
+        // Gera novo token de verificação
+        const tokenVerificacao = crypto.randomBytes(32).toString("hex");
+        usuario.tokenVerificacao = tokenVerificacao;
+        await usuario.save();
+
+        await enviarEmailVerificacao(usuario.email, tokenVerificacao);
+
+        return res.json({ mensagem: "📧 Link de verificação reenviado com sucesso!" });
+    } catch (err) {
+        console.error("Erro /resend-verification:", err);
+        return res.status(500).json({ mensagem: "Erro ao reenviar o email de verificação." });
     }
 });
 
@@ -103,7 +170,6 @@ router.get("/reset-password/:token", async (req, res) => {
             return res.send("❌ Token inválido ou expirado!");
         }
 
-        // HTML simples com método POST correto
         res.send(`
             <h2>Redefinir Senha</h2>
             <form action="/auth/reset-password/${token}" method="POST">
@@ -123,9 +189,8 @@ router.get("/reset-password/:token", async (req, res) => {
 ======================================================= */
 router.post("/reset-password/:token", async (req, res) => {
     const token = req.params.token;
-    const novaSenha = req.body.novaSenha; // Garantido que vem do form HTML
+    const novaSenha = req.body.novaSenha;
 
-    // Log para depuração
     console.log("req.body:", req.body);
 
     if (!novaSenha) {
@@ -142,7 +207,7 @@ router.post("/reset-password/:token", async (req, res) => {
             return res.status(400).send("❌ Token inválido ou expirado!");
         }
 
-        usuario.senha = novaSenha; // será criptografada pelo pre('save')
+        usuario.senha = novaSenha;
         usuario.resetPasswordToken = null;
         usuario.resetPasswordExpires = null;
 

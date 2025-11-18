@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 // Conecta no banco
 connect();
 
-// Rotas da API
+// Rotas da API 
 app.use("/auth", authRoutes);
 app.use("/materias", materiasRoutes);
 app.use("/turmas", turmaRoutes);

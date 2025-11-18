@@ -1,4 +1,3 @@
-// server/utils/enviarEmailVerificacao.js
 const nodemailer = require("nodemailer");
 
 async function enviarEmailVerificacao(email, token) {
@@ -8,16 +7,21 @@ async function enviarEmailVerificacao(email, token) {
       service: "gmail",
       auth: {
         user: "projetoe81@gmail.com",   // seu e-mail Gmail
-        pass: "skve roue bgne zhql"        // senha de app gerada no Gmail
+        pass: "skve roue bgne zhql"        // use senha de app gerada no Gmail
       }
     });
 
+    // Verifica se o transporter está OK
+    await transporter.verify();
+    console.log("✅ Transporter verificado com sucesso.");
+
     // 2️⃣ Link de verificação
     const link = `http://localhost:3000/auth/verify/${token}`;
+    console.log(`🔗 Link de verificação gerado: ${link}`);
 
     // 3️⃣ Envia o e-mail
     const info = await transporter.sendMail({
-      from: "Sistema Escolar <projetoe81@gmail.com>", // deve ser o mesmo do auth
+      from: "Sistema Escolar <projetoe81@gmail.com>",
       to: email,
       subject: "Verifique seu e-mail",
       html: `
@@ -33,7 +37,7 @@ async function enviarEmailVerificacao(email, token) {
 
     console.log(`✔ Email de verificação enviado! MessageId: ${info.messageId}`);
   } catch (err) {
-    console.error("❌ Erro ao enviar email:", err.response || err);
+    console.error("❌ Erro ao enviar email de verificação:", err);
   }
 }
 
