@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro e Gestão de Matérias - EduGest</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">EduGest</span>
+                <span class="system-name">Sistema de Gestão Escolar</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="home.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="alunos.html"><i class="fas fa-users"></i> Alunos & Funcionários</a></li>
+                    <li><a href="#"><i class="fas fa-book"></i> Sistema de Notas</a></li>
+                    <li><a href="frequencia.html"><i class="fas fa-clipboard-list"></i> Frequência</a></li>
+                    <li><a href="#"><i class="fas fa-award"></i> Boletins</a></li>
+                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                    <li><a href="cadastro-turmas.html"><i class="fas fa-chalkboard"></i> Cad. Turmas</a></li>
+                    <li><a href="materias.html" class="active"><i class="fas fa-book"></i> Cad. Matérias</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-stats">
+                <h3>ESTATÍSTICAS GERAIS</h3>
+                <div class="stat-card">
+                    <h4>Total de Alunos</h4>
+                    <p>1,247</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Funcionários</h4>
+                    <p>84</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Média Geral</h4>
+                    <p>8.1</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="navbar">
+                <div class="navbar-left">
+                    <h2>Cadastro e Gestão de Matérias</h2>
+                </div>
+                <div class="navbar-right">
+                    <span class="navbar-item">2º Bimestre</span>
+                    <span class="navbar-item">Modo Demo</span>
+                    
+                    <div class="dropdown-container">
+                        <button class="icon-button" id="notification-button">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">2</span>
+                        </button>
+                        <div class="dropdown-menu" id="notification-dropdown">
+                             </div>
+                    </div>
+                    
+                    <div class="dropdown-container">
+                        <button class="profile-button" id="profile-button">A</button>
+                        <div class="dropdown-menu" id="profile-dropdown">
+                            <div class="profile-info">
+                                <strong>admin</strong>
+                                <small>admin@gmail.com</small>
+                                <span>Admin</span>
+                            </div>
+                            <a href="#" class="dropdown-item"><i class="fas fa-user-circle"></i> Meu Perfil</a>
+                            <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> ConfiguraÇÕES</a>
+                            <a href="login.html" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content p-4">
+                
+                <div class="card p-4 mb-4 shadow-sm">
+                    <h4>Cadastrar Nova Matéria</h4>
+                    <form id="formCadastroMateria">
+                        <div class="form-group row mb-3">
+                            <label for="nome" class="col-sm-3 col-form-label">Nome da Matéria:</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="nome" required>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-3">
+                            <label for="professor" class="col-sm-3 col-form-label">Professor (ID):</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="professor" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success mt-2">Salvar Matéria</button>
+                    </form>
+                </div>
+
+                <div class="card p-4 shadow-sm">
+                    <h4>Lista de Matérias Cadastradas</h4>
+                    <table class="table table-hover table-striped" id="tabelaMaterias">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Professor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaMaterias">
+                            </tbody>
+                    </table>
+                </div>
+
+            </div>
+            </main>
+    </div>
+
+    <script src="js/materias.js"></script> 
+    </body>
+</html>
