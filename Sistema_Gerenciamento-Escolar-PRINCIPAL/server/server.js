@@ -16,7 +16,9 @@ const professorRoutes = require("./routes/professorRoutes");
 const presencaRoutes = require("./routes/presencaRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const alunoRoutes = require("./routes/alunoRoutes");
-const listagemRoutes = require("./routes/listagemRoutes"); // rota de listagem
+const listagemRoutes = require("./routes/listagemRoutes");
+// 🛑 NOVO CÓDIGO: Importação das Rotas de Responsáveis 🛑
+const responsaveisRoutes = require("./routes/responsaveis"); 
 
 // ==========================================
 // APP CONFIG
@@ -31,7 +33,6 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "../public")));
 
 // 📸 LIBERAR PASTA DE UPLOADS (Imagens de Perfil)
-// Isso permite acessar http://localhost:3000/uploads/nome-da-foto.jpg
 app.use('/uploads', express.static(path.join(__dirname, "uploads")));
 
 // Conecta ao MongoDB
@@ -45,6 +46,9 @@ app.use("/materias", materiasRoutes);
 app.use("/turmas", turmaRoutes);
 app.use("/professores", professorRoutes);
 app.use("/alunos", alunoRoutes);
+
+// 🛑 NOVO CÓDIGO: Uso das Rotas de Responsáveis 🛑
+app.use("/responsaveis", responsaveisRoutes);
 
 // Rotas com prefixo /api
 app.use("/api/presencas", presencaRoutes);
@@ -61,5 +65,5 @@ app.use("/listagem", listagemRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`🔥 API Unificada rodando na porta ${PORT}`);
+    console.log(`🔥 API Unificada rodando na porta ${PORT}`);
 });

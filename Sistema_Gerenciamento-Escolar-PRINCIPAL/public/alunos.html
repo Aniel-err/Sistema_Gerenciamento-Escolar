@@ -175,6 +175,7 @@
                 <div class="tab-navigation" style="padding: 0 20px; margin-top: 15px;">
                     <button class="tab-link active" data-tab="tab-alunos">Alunos</button>
                     <button class="tab-link" data-tab="tab-professores">Professores & Coordenadores</button>
+                    <button class="tab-link" data-tab="tab-responsaveis">Responsáveis</button> 
                 </div>
 
                 <div class="tab-content active" id="tab-alunos" style="padding: 20px;">
@@ -210,8 +211,25 @@
                         </table>
                     </div>
                 </div>
-
-            </div>
+                
+                <div class="tab-content" id="tab-responsaveis" style="padding: 20px;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Telefone</th>
+                                    <th>Aluno Vinculado (Matrícula)</th>
+                                    <th class="admin-only-col">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoTabelaListagemResponsaveis">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+                </div>
         </main>
     </div>
 

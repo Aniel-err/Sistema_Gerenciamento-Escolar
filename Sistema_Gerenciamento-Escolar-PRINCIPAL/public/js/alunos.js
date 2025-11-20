@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('token');
     const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
     const isAdmin = usuarioLogado && usuarioLogado.tipo === 'admin';
+    const API_BASE_URL = 'http://localhost:3000'; // Define a URL base para facilitar
 
     // Container de Botões do Header
     const btnContainer = document.getElementById('btnContainer');
@@ -12,6 +13,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalAluno = document.getElementById('modalAluno');
     const modalProfessor = document.getElementById('modalProfessor');
     
+    // ============================================================
+    // ⚙️ FUNÇÕES GERAIS E UTILS
+    // ============================================================
+
+    // Função para redirecionar para a página de cadastro de responsáveis
+    window.irParaCadastroResponsaveis = () => {
+        window.location.href = 'responsaveis.html';
+    };
+
     // --- BOTÕES DE AÇÃO ---
     function atualizarBotoesHeader(abaAtiva) {
         btnContainer.innerHTML = ''; // Limpa
@@ -27,6 +37,14 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.className = 'btn btn-primary';
             btn.innerHTML = '<i class="fas fa-plus"></i> Novo Professor';
             btn.onclick = () => openModal(modalProfessor);
+            btnContainer.appendChild(btn);
+        } else if (abaAtiva === 'tab-responsaveis') { // ADICIONADO: Botão para Responsáveis
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-primary';
+            btn.style.backgroundColor = '#1abc9c'; // Cor verde para Novo Responsável
+            btn.style.borderColor = '#1abc9c';
+            btn.innerHTML = '<i class="fas fa-plus"></i> Novo Responsável';
+            btn.onclick = () => irParaCadastroResponsaveis(); // Chama a função de redirecionamento
             btnContainer.appendChild(btn);
         }
     }
@@ -45,6 +63,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Atualiza botão do topo
             atualizarBotoesHeader(tabId);
+            
+            // Carrega dados ao trocar de aba
+            if (tabId === 'tab-alunos') {
+                carregarAlunos();
+            } else if (tabId === 'tab-professores') {
+                carregarProfessores();
+            } else if (tabId === 'tab-responsaveis') { 
+                carregarResponsaveis(); // Chama a função de listagem de Responsáveis
+            }
         });
     });
 
@@ -66,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     async function carregarAlunos() {
         try {
-            const res = await fetch('http://localhost:3000/alunos', {
+            const res = await fetch(`${API_BASE_URL}/alunos`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const alunos = await res.json();
@@ -98,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.deletarAluno = async (id) => {
         if(!confirm('Remover aluno?')) return;
-        await fetch(`http://localhost:3000/alunos/${id}`, { 
+        await fetch(`${API_BASE_URL}/alunos/${id}`, { 
             method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } 
         });
         carregarAlunos();
@@ -112,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
             turmaId: document.getElementById('turmaSelect').value,
             responsavel: document.getElementById('responsavelAluno').value
         };
-        await fetch('http://localhost:3000/alunos', {
+        await fetch(`${API_BASE_URL}/alunos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(dados)
@@ -123,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Carregar Turmas para o Select
     async function carregarTurmasSelect() {
-        const res = await fetch('http://localhost:3000/turmas', { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await fetch(`${API_BASE_URL}/turmas`, { headers: { 'Authorization': `Bearer ${token}` } });
         const turmas = await res.json();
         const select = document.getElementById('turmaSelect');
         select.innerHTML = '<option value="">Selecione...</option>';
@@ -139,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     async function carregarProfessores() {
         try {
-            const res = await fetch('http://localhost:3000/professores', {
+            const res = await fetch(`${API_BASE_URL}/professores`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const profs = await res.json();
@@ -183,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.deletarProfessor = async (id) => {
         if(!confirm('Tem certeza? Isso removerá o acesso do professor ao sistema.')) return;
-        const res = await fetch(`http://localhost:3000/professores/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/professores/${id}`, {
             method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
         });
         if(res.ok) carregarProfessores();
@@ -192,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.mudarCargo = async (id, isCoord) => {
         const novoCargo = isCoord ? 'coordenador' : 'professor';
-        await fetch(`http://localhost:3000/professores/${id}`, {
+        await fetch(`${API_BASE_URL}/professores/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ cargo: novoCargo })
@@ -211,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cargo: document.getElementById('cargoProf').value
         };
 
-        const res = await fetch('http://localhost:3000/professores', {
+        const res = await fetch(`${API_BASE_URL}/professores`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(dados)
@@ -227,8 +254,101 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // ============================================================
+    // 👪 LÓGICA DE RESPONSÁVEIS (Listar e Deletar)
+    // ============================================================
+    
+    // Função para deletar (agora acessível globalmente)
+    window.deletarResponsavel = async (id) => {
+        if (!confirm('Tem certeza que deseja remover este responsável?')) return;
+        try {
+            const res = await fetch(`${API_BASE_URL}/responsaveis/${id}`, { 
+                method: 'DELETE', 
+                headers: { 'Authorization': `Bearer ${token}` } 
+            });
+            if (res.ok) {
+                alert('Responsável removido com sucesso!');
+                carregarResponsaveis(); // Recarrega a lista após a exclusão
+            } else {
+                alert('Erro ao deletar responsável.');
+            }
+        } catch (err) {
+            console.error('Erro na exclusão:', err);
+        }
+    };
 
-    // INICIALIZAÇÃO
+    async function carregarResponsaveis() {
+        const corpoTabela = document.getElementById('corpoTabelaListagemResponsaveis');
+        corpoTabela.innerHTML = `<tr><td colspan="5">Carregando...</td></tr>`; 
+
+        try {
+            if (!token) {
+                corpoTabela.innerHTML = `<tr><td colspan="5">Erro: Usuário não autenticado.</td></tr>`;
+                return;
+            }
+
+            const response = await fetch(`${API_BASE_URL}/responsaveis`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Erro ao carregar a lista de responsáveis. Verifique o console ou se a rota está implementada no backend.');
+            }
+
+            const responsaveis = await response.json();
+            
+            corpoTabela.innerHTML = ''; 
+
+            if (responsaveis.length === 0) {
+                corpoTabela.innerHTML = `<tr><td colspan="5">Nenhum responsável cadastrado.</td></tr>`;
+                return;
+            }
+
+            responsaveis.forEach(responsavel => {
+                const tr = document.createElement('tr');
+                
+                // 💡 CORREÇÃO APLICADA: Acessamos o objeto aluno populado (responsavel.aluno)
+                const alunoVinculado = responsavel.aluno; 
+                
+                let alunoVinculadoTexto = 'N/A';
+                
+                if (alunoVinculado && alunoVinculado.nome && alunoVinculado.matricula) {
+                    // Formato: Nome do Aluno (Matrícula)
+                    alunoVinculadoTexto = `${alunoVinculado.nome} (${alunoVinculado.matricula})`;
+                } else if (alunoVinculado && alunoVinculado.matricula) {
+                    // Caso o nome não venha, mostra apenas a Matrícula
+                    alunoVinculadoTexto = alunoVinculado.matricula;
+                } else if (responsavel.alunoMatricula) { 
+                    // Fallback se o backend não estiver populando corretamente, mas estiver mandando a matrícula solta
+                    alunoVinculadoTexto = responsavel.alunoMatricula;
+                }
+
+
+                tr.innerHTML = `
+                    <td>${responsavel.nome}</td>
+                    <td>${responsavel.email}</td>
+                    <td>${responsavel.telefone || 'N/A'}</td>
+                    <td>${alunoVinculadoTexto}</td> <td>
+                        <button class="btn-action btn-delete" onclick="deletarResponsavel('${responsavel._id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                corpoTabela.appendChild(tr);
+            });
+
+        } catch (error) {
+            console.error('Erro ao listar responsáveis:', error);
+            corpoTabela.innerHTML = `<tr><td colspan="5">Falha ao carregar responsáveis: ${error.message}</td></tr>`;
+        }
+    }
+
+
+    // INICIALIZAÇÃO: Carrega os dados iniciais e configura o botão do header.
     carregarAlunos();
     carregarTurmasSelect();
     carregarProfessores();
