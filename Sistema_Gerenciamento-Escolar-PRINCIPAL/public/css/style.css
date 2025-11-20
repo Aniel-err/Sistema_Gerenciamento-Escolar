@@ -1127,3 +1127,178 @@ body {
     margin-bottom: 15px;
     color: #e0e0e0;
 }
+/* --- Estilo da Página de Listagem de Alunos/Turmas/Professores --- */
+
+.listing-container {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 1100px;
+    margin: auto;
+    margin-top: 20px;
+}
+
+.listing-container h2 {
+    font-size: 1.9em;
+    color: #3f51b5;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* Cabeçalho da listagem */
+.listing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.listing-header h2 {
+    margin: 0;
+}
+
+.listing-header .btn-add {
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    padding: 12px 20px;
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 150, 0, 0.2);
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.listing-header .btn-add:hover {
+    background: linear-gradient(90deg, #8BC34A, #4CAF50);
+    transform: translateY(-2px);
+}
+
+/* Filtros */
+.listing-filters {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.listing-filters .filter {
+    display: flex;
+    flex-direction: column;
+}
+
+.listing-filters label {
+    font-size: 0.85em;
+    color: #6a737b;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.listing-filters input,
+.listing-filters select {
+    padding: 10px 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 0.95em;
+    transition: border-color 0.3s ease;
+}
+
+.listing-filters input:focus,
+.listing-filters select:focus {
+    border-color: #4CAF50;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+/* Tabela */
+.listing-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+}
+
+.listing-table th {
+    background-color: #f1f1f1;
+    padding: 15px;
+    text-align: left;
+    font-size: 0.9em;
+    color: #555;
+    text-transform: uppercase;
+    border-bottom: 2px solid #e0e0e0;
+    font-weight: 600;
+}
+
+.listing-table td {
+    padding: 15px;
+    font-size: 0.95em;
+    color: #333;
+    border-bottom: 1px solid #eee;
+}
+
+.listing-table tr:hover {
+    background-color: #f7f7f7;
+}
+
+/* Botões da tabela */
+.table-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.table-actions button {
+    border: none;
+    background: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.table-actions button:hover {
+    transform: scale(1.1);
+}
+
+.table-actions .edit { color: #2196F3; }
+.table-actions .delete { color: #f44336; }
+.table-actions .view { color: #6a737b; }
+
+/* Botão voltar */
+.btn-voltar {
+    display: inline-block;
+    margin-bottom: 20px;
+    text-decoration: none;
+    padding: 10px 16px;
+    background: #303030;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-voltar:hover {
+    opacity: 0.8;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .listing-container {
+        padding: 20px;
+    }
+
+    .listing-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .listing-filters {
+        flex-direction: column;
+    }
+
+    .listing-table th,
+    .listing-table td {
+        padding: 12px;
+    }
+}
