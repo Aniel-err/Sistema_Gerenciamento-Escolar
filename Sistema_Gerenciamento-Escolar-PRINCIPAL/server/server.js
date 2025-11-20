@@ -1,3 +1,4 @@
+// server/server.js
 require('dotenv').config();
 
 const express = require("express");
@@ -26,8 +27,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Arquivos estáticos
+// Arquivos estáticos (Frontend)
 app.use(express.static(path.join(__dirname, "../public")));
+
+// 📸 LIBERAR PASTA DE UPLOADS (Imagens de Perfil)
+// Isso permite acessar http://localhost:3000/uploads/nome-da-foto.jpg
+app.use('/uploads', express.static(path.join(__dirname, "uploads")));
 
 // Conecta ao MongoDB
 connect();
@@ -48,7 +53,7 @@ app.use("/api/dashboard", dashboardRoutes);
 // ==========================================
 // 3. ROTA DE LISTAGEM
 // ==========================================
-app.use("/listagem", listagemRoutes); // já funciona para alunos e professores
+app.use("/listagem", listagemRoutes); 
 
 // ==========================================
 // SERVER

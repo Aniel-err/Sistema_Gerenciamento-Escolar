@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,24 +15,52 @@
             width: 40px;
             height: 20px;
         }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
         .slider {
-            position: absolute; cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc; transition: .4s; border-radius: 20px;
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
         }
+
         .slider:before {
-            position: absolute; content: "";
-            height: 14px; width: 14px; left: 3px; bottom: 3px;
-            background-color: white; transition: .4s; border-radius: 50%;
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
         }
-        input:checked + .slider { background-color: #3f51b5; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        
+
+        input:checked+.slider {
+            background-color: #3f51b5;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
         /* Esconde botão se não for admin */
-        .admin-only { display: none; }
+        .admin-only {
+            display: none;
+        }
     </style>
 </head>
+
 <body>
     <div class="dashboard-wrapper">
         <aside class="sidebar">
@@ -41,13 +70,59 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="home.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                    <li><a href="alunos.html" class="active"><i class="fas fa-users"></i> Alunos & Funcionários</a></li>
-                    <li><a href="#"><i class="fas fa-book"></i> Sistema de Notas</a></li>
-                    <li><a href="frequencia.html"><i class="fas fa-clipboard-list"></i> Frequência</a></li>
-                    <li><a href="#"><i class="fas fa-award"></i> Boletins</a></li>
-                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
-                    <li><a href="cadastro-turmas.html"><i class="fas fa-chalkboard"></i> Cad. Turmas</a></li>
+                    <li>
+                        <a href="home.html" id="link-home">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="alunos.html" id="link-alunos">
+                            <i class="fas fa-users"></i> Alunos & Funcionários
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-book"></i> Sistema de Notas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="frequencia.html" id="link-frequencia">
+                            <i class="fas fa-clipboard-list"></i> Frequência
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-award"></i> Boletins
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-alt"></i> Eventos
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="cadastro-turmas.html" id="link-turmas">
+                            <i class="fas fa-chalkboard"></i> Cad. Turmas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="materias.html" id="link-materias">
+                            <i class="fas fa-book-open"></i> Cad. Matérias
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="listagem.html" id="link-listagem">
+                            <i class="fas fa-list-alt"></i> Listagem Geral
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>
@@ -58,13 +133,45 @@
                     <h1 class="page-title">Gestão de Pessoas</h1>
                 </div>
                 <div class="navbar-right">
-                    <div id="btnContainer">
+                    <div id="btnContainer" style="margin-right: 20px;"></div>
+
+                    <div class="dropdown-container">
+                        <button class="icon-button" id="notification-button">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">2</span>
+                        </button>
+                        <div class="dropdown-menu" id="notification-dropdown">
+                            <div class="dropdown-header">Notificações <a href="#">Limpar todas</a></div>
+                            <div class="notification-item">
+                                <i class="fas fa-info-circle info-icon"></i>
+                                <div>
+                                    <strong>Bem-vindo!</strong>
+                                    <p>Sistema atualizado com sucesso.</p>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="dropdown-container">
+                        <button class="profile-button" id="profile-button">U</button>
+                        <div class="dropdown-menu" id="profile-dropdown">
+                            <div class="profile-info">
+                                <strong id="nav-user-name">Carregando...</strong>
+                                <small id="nav-user-email">...</small>
+                                <span id="nav-user-role">...</span>
+                            </div>
+                            <a href="perfil.html" class="dropdown-item"><i class="fas fa-user-circle"></i> Meu
+                                Perfil</a>
+                            <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Configurações</a>
+                            <a href="#" id="btn-logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>
+                                Sair</a>
+                        </div>
+                    </div>
                 </div>
             </header>
 
             <div class="card full-height-card" style="padding:0;">
-                
+
                 <div class="tab-navigation" style="padding: 0 20px; margin-top: 15px;">
                     <button class="tab-link active" data-tab="tab-alunos">Alunos</button>
                     <button class="tab-link" data-tab="tab-professores">Professores & Coordenadores</button>
@@ -183,5 +290,7 @@
     </div>
 
     <script src="js/alunos.js"></script>
+    <script src="js/global.js"></script>
 </body>
+
 </html>

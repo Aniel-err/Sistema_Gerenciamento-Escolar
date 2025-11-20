@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - EduGest</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .profile-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Área da Foto */
+        .avatar-container {
+            position: relative;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .profile-avatar-large {
+            width: 150px;
+            height: 150px;
+            background-color: #3f51b5;
+            color: white;
+            font-size: 4em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            font-weight: bold;
+            overflow: hidden;
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+        }
+
+        .profile-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            transition: transform 0.2s;
+        }
+
+        .avatar-container:hover .avatar-overlay {
+            transform: scale(1.1);
+        }
+
+        /* Formulário */
+        .profile-form {
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        /* Input file escondido */
+        #fotoInput {
+            display: none;
+        }
+
+        .readonly-field {
+            background-color: #f0f0f0;
+            color: #777;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">EduGest</span>
+                <span class="system-name">Sistema de Gestão Escolar</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="home.html" id="link-home">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="alunos.html" id="link-alunos">
+                            <i class="fas fa-users"></i> Alunos & Funcionários
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-book"></i> Sistema de Notas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="frequencia.html" id="link-frequencia">
+                            <i class="fas fa-clipboard-list"></i> Frequência
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-award"></i> Boletins
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-alt"></i> Eventos
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="cadastro-turmas.html" id="link-turmas">
+                            <i class="fas fa-chalkboard"></i> Cad. Turmas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="materias.html" id="link-materias">
+                            <i class="fas fa-book-open"></i> Cad. Matérias
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="listagem.html" id="link-listagem">
+                            <i class="fas fa-list-alt"></i> Listagem Geral
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="navbar">
+                <div class="navbar-left">
+                    <h1 class="page-title">Editar Perfil</h1>
+                </div>
+                <div class="navbar-right">
+                    <div class="dropdown-container">
+                        <button class="profile-button" id="profile-button">U</button>
+                        <div class="dropdown-menu" id="profile-dropdown">
+                            <div class="profile-info">
+                                <strong id="nav-user-name">...</strong>
+                                <small id="nav-user-email">...</small>
+                                <span id="nav-user-role">...</span>
+                            </div>
+                            <a href="perfil.html" class="dropdown-item"><i class="fas fa-user-circle"></i> Meu
+                                Perfil</a>
+                            <a href="#" id="btn-logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>
+                                Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="card full-height-card">
+                <div class="profile-card">
+
+                    <form id="profileForm" class="profile-form">
+
+                        <div class="avatar-container" onclick="document.getElementById('fotoInput').click()">
+                            <div class="profile-avatar-large" id="previewAvatar">U</div>
+
+                            <div class="avatar-overlay">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <input type="file" id="fotoInput" accept="image/*">
+                        </div>
+                        <p
+                            style="text-align: center; color: #888; font-size: 0.9em; margin-top: -20px; margin-bottom: 30px;">
+                            Clique na foto para alterar</p>
+
+                        <div class="form-group">
+                            <label>Nome Completo</label>
+                            <input type="text" id="nome" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>E-mail (Não editável)</label>
+                            <input type="email" id="email" class="form-input readonly-field" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cargo</label>
+                            <input type="text" id="cargo" class="form-input readonly-field" readonly>
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
+
+                        <div class="form-group">
+                            <label>Nova Senha <small>(Deixe em branco se não quiser mudar)</small></label>
+                            <input type="password" id="senha" class="form-input" placeholder="Digite para alterar">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Confirmar Nova Senha</label>
+                            <input type="password" id="confirmaSenha" class="form-input" placeholder="Repita a senha">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                            <i class="fas fa-save"></i> Salvar Alterações
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/global.js"></script>
+    <script src="js/perfil.js"></script>
+</body>
+
+</html>

@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - EduGest</title>
-    
+
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
+
 <body>
     <div class="dashboard-wrapper">
         <aside class="sidebar">
@@ -18,15 +20,59 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="home.html" class="active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                    <li><a href="alunos.html"><i class="fas fa-users"></i> Alunos & Funcionários</a></li>
-                    <li><a href="#"><i class="fas fa-book"></i> Sistema de Notas</a></li>
-                    <li><a href="frequencia.html"><i class="fas fa-clipboard-list"></i> Frequência</a></li>
-                    <li><a href="#"><i class="fas fa-award"></i> Boletins</a></li>
-                    <li><a href="#"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
-                    <li><a href="cadastro-turmas.html"><i class="fas fa-chalkboard"></i> Cad. Turmas</a></li>
-                    <li><a href="materias.html"><i class="fas fa-book"></i> Cad. Matérias</a></li>
-                    <li><a href="listagem.html"><i class="fas fa-users"></i>Listagem </a></li>
+                    <li>
+                        <a href="home.html" id="link-home">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="alunos.html" id="link-alunos">
+                            <i class="fas fa-users"></i> Alunos & Funcionários
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-book"></i> Sistema de Notas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="frequencia.html" id="link-frequencia">
+                            <i class="fas fa-clipboard-list"></i> Frequência
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-award"></i> Boletins
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-alt"></i> Eventos
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="cadastro-turmas.html" id="link-turmas">
+                            <i class="fas fa-chalkboard"></i> Cad. Turmas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="materias.html" id="link-materias">
+                            <i class="fas fa-book-open"></i> Cad. Matérias
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="listagem.html" id="link-listagem">
+                            <i class="fas fa-list-alt"></i> Listagem Geral
+                        </a>
+                    </li>
                 </ul>
             </nav>
             <div class="sidebar-stats">
@@ -49,11 +95,11 @@
         <main class="main-content">
             <header class="navbar">
                 <div class="navbar-left">
-                    </div>
+                </div>
                 <div class="navbar-right">
                     <span class="navbar-item">2º Bimestre</span>
-                    <span class="navbar-item">Modo Demo</span>
-                    
+                    <span class="navbar-item">Modo Sistema</span>
+
                     <div class="dropdown-container">
                         <button class="icon-button" id="notification-button">
                             <i class="fas fa-bell"></i>
@@ -62,41 +108,35 @@
                         <div class="dropdown-menu" id="notification-dropdown">
                             <div class="dropdown-header">Notificações <a href="#">Limpar todas</a></div>
                             <div class="notification-item">
-                                <i class="fas fa-exclamation-triangle warning-icon"></i>
-                                <div>
-                                    <strong>Faltas não justificadas</strong>
-                                    <p>5 alunos com faltas não justificadas hoje</p>
-                                    <small>16/11/2025, 11:30:00</small>
-                                </div>
-                            </div>
-                            <div class="notification-item">
                                 <i class="fas fa-info-circle info-icon"></i>
                                 <div>
-                                    <strong>Boletins disponíveis</strong>
-                                    <p>Novos boletins do 3º bimestre foram gerados</p>
-                                    <small>16/11/2025, 10:15:00</small>
+                                    <strong>Bem-vindo!</strong>
+                                    <p>Sistema atualizado com sucesso.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="dropdown-container">
-                        <button class="profile-button" id="profile-button">A</button>
+                        <button class="profile-button" id="profile-button">U</button>
                         <div class="dropdown-menu" id="profile-dropdown">
                             <div class="profile-info">
-                                <strong>admin</strong>
-                                <small>admin@gmail.com</small>
-                                <span>Admin</span>
+                                <strong id="nav-user-name">Carregando...</strong>
+                                <small id="nav-user-email">...</small>
+                                <span id="nav-user-role">...</span>
                             </div>
-                            <a href="#" class="dropdown-item"><i class="fas fa-user-circle"></i> Meu Perfil</a>
-                            <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> ConfiguraÇÕES</a>
-                            <a href="login.html" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                            <a href="perfil.html" class="dropdown-item"><i class="fas fa-user-circle"></i> Meu
+                                Perfil</a>
+                            <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Configurações</a>
+                            <a href="#" id="btn-logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>
+                                Sair</a>
                         </div>
                     </div>
                 </div>
             </header>
 
             <div class="dashboard-grid">
+
                 <div class="card card-wide">
                     <h3>Frequência Semanal</h3>
                     <p class="card-subtitle">Presença vs Faltas por dia da semana</p>
@@ -112,7 +152,7 @@
                         <div id="monthlyPerformanceChart" style="width: 100%; height: 250px;"></div>
                     </div>
                 </div>
-                
+
                 <div class="card">
                     <h3>Distribuição de Notas</h3>
                     <p class="card-subtitle">Classificação do desempenho dos alunos</p>
@@ -152,7 +192,8 @@
                         <li><i class="fas fa-calendar-day text-primary"></i> 27/Nov: Reunião de Pais (18h-20h)</li>
                         <li><i class="fas fa-graduation-cap text-info"></i> 01/Dez: Prova de Matemática (09h-10h30)</li>
                         <li><i class="fas fa-microscope text-success"></i> 03/Dez: Feira de Ciências (14h-17h)</li>
-                        <li><i class="fas fa-chalkboard-teacher text-warning"></i> 05/Dez: Conselho de Classe (10h-12h)</li>
+                        <li><i class="fas fa-chalkboard-teacher text-warning"></i> 05/Dez: Conselho de Classe (10h-12h)
+                        </li>
                     </ul>
                 </div>
 
@@ -160,15 +201,20 @@
                     <h3>Alertas</h3>
                     <p class="card-subtitle">Situações que requerem atenção</p>
                     <ul class="alerts-list">
-                        <li><i class="fas fa-exclamation-circle text-danger"></i> 2 estudantes com mais de 10 faltas.</li>
-                        <li><i class="fas fa-exclamation-circle text-warning"></i> 1 professor(a) faltou hoje (Matemática).</li>
-                        <li><i class="fas fa-info-circle text-info"></i> Boletins do 1º Bimestre prontos para revisão.</li>
+                        <li><i class="fas fa-exclamation-circle text-danger"></i> 2 estudantes com mais de 10 faltas.
+                        </li>
+                        <li><i class="fas fa-exclamation-circle text-warning"></i> 1 professor(a) faltou hoje
+                            (Matemática).</li>
+                        <li><i class="fas fa-info-circle text-info"></i> Boletins do 1º Bimestre prontos para revisão.
+                        </li>
                     </ul>
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="js/global.js"></script>
     <script src="js/home.js"></script>
 </body>
+
 </html>

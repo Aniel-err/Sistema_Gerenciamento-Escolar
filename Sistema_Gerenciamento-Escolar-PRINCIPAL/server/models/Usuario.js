@@ -1,3 +1,4 @@
+// server/models/Usuario.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -13,6 +14,9 @@ const UsuarioSchema = new mongoose.Schema(
       enum: ['aluno', 'professor', 'coordenador', 'admin'],
       default: 'aluno'
     },
+
+    // 📸 NOVO CAMPO PARA A FOTO DE PERFIL
+    foto: { type: String, default: null },
 
     /* ==================================================
        🔹 VERIFICAÇÃO DE EMAIL

@@ -2,45 +2,10 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // --- LÓGICA DOS DROPDOWNS (Perfil e Notificações) ---
-    // (Esta parte continua igual)
-
-    const notificationButton = document.getElementById('notification-button');
-    const notificationDropdown = document.getElementById('notification-dropdown');
-
-    if (notificationButton) {
-        notificationButton.addEventListener('click', function(event) {
-            event.stopPropagation();
-            notificationDropdown.classList.toggle('show');
-            if (profileDropdown) profileDropdown.classList.remove('show');
-        });
-    }
-
-    const profileButton = document.getElementById('profile-button');
-    const profileDropdown = document.getElementById('profile-dropdown');
-
-    if (profileButton) {
-        profileButton.addEventListener('click', function(event) {
-            event.stopPropagation();
-            profileDropdown.classList.toggle('show');
-            if (notificationDropdown) notificationDropdown.classList.remove('show');
-        });
-    }
-
-    window.addEventListener('click', function(event) {
-        if (notificationDropdown && !notificationDropdown.contains(event.target) && !notificationButton.contains(event.target)) {
-            notificationDropdown.classList.remove('show');
-        }
-        if (profileDropdown && !profileDropdown.contains(event.target) && !profileButton.contains(event.target)) {
-            profileDropdown.classList.remove('show');
-        }
-    });
-
-    
-    // --- GRÁFICOS (AGORA COM GOOGLE CHARTS) ---
+    // --- GRÁFICOS (GOOGLE CHARTS) ---
+    // A lógica de menu/perfil foi movida para global.js para evitar conflitos.
 
     // 1. Carrega o Google Charts
-    // Pede os pacotes 'corechart' (para Linha, Barra, Pizza)
     google.charts.load('current', {'packages':['corechart']});
 
     // 2. Define uma função para chamar QUANDO os gráficos estiverem prontos
@@ -55,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- GRÁFICO 1: Performance Mensal (Linha) ---
     function drawMonthlyPerformance() {
+        // Dados simulados (Futuramente virão do backend)
         const data = google.visualization.arrayToDataTable([
             ['Mês', 'Média Geral', { role: 'style' }],
             ['Jan', 7.2, 'point { size: 6; shape-type: circle; fill-color: #3f51b5; }'],

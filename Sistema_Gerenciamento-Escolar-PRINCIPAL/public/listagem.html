@@ -1,125 +1,152 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem Geral - EduGest</title>
 
-    <title>Listagem de Alunos e Professores</title>
-
-    <style>
-        /* PADRONIZAÇÃO DO SISTEMA */
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            padding: 30px;
-        }
-
-        /* CONTAINER GERAL */
-        .listing-container {
-            background-color: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 100%;
-            max-width: 1100px;
-            margin: auto;
-            margin-top: 20px;
-        }
-
-        .listing-container h1 {
-            font-size: 1.9em;
-            color: #3f51b5;
-            font-weight: 700;
-            margin-bottom: 15px;
-            border-left: 6px solid #3f51b5;
-            padding-left: 10px;
-        }
-
-        /* TABELAS */
-        .listing-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            margin-bottom: 35px;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .listing-table th, 
-        .listing-table td {
-            padding: 14px;
-            border: 1px solid #dcdcdc;
-            text-align: left;
-            font-size: 15px;
-        }
-
-        .listing-table th {
-            background: #303030;
-            color: white;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-
-        .listing-table tr:hover {
-            background: #f7f7f7;
-        }
-
-        /* BOTÃO VOLTAR */
-        .btn-voltar {
-            display: inline-block;
-            margin-bottom: 20px;
-            text-decoration: none;
-            padding: 10px 16px;
-            background: #303030;
-            color: white;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .btn-voltar:hover {
-            opacity: 0.8;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo">EduGest</span>
+                <span class="system-name">Sistema de Gestão Escolar</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="home.html" id="link-home">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
 
-    <a class="btn-voltar" href="home.html">⬅ Voltar</a>
+                    <li>
+                        <a href="alunos.html" id="link-alunos">
+                            <i class="fas fa-users"></i> Alunos & Funcionários
+                        </a>
+                    </li>
 
-    <div class="listing-container">
-        
-        <h1>Listagem de Alunos</h1>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-book"></i> Sistema de Notas
+                        </a>
+                    </li>
 
-        <table class="listing-table">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Matrícula</th>
-                </tr>
-            </thead>
-            <tbody id="tabela-alunos"></tbody>
-        </table>
+                    <li>
+                        <a href="frequencia.html" id="link-frequencia">
+                            <i class="fas fa-clipboard-list"></i> Frequência
+                        </a>
+                    </li>
 
-        <h1>Listagem de Professores</h1>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-award"></i> Boletins
+                        </a>
+                    </li>
 
-        <table class="listing-table">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>E-mail</th>
-                    <th>Disciplina</th>
-                    <th>Cargo</th>
-                    <th>id</th>
-                    
-                </tr>
-            </thead>
-            <tbody id="tabela-professores"></tbody>
-        </table>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-alt"></i> Eventos
+                        </a>
+                    </li>
 
+                    <li>
+                        <a href="cadastro-turmas.html" id="link-turmas">
+                            <i class="fas fa-chalkboard"></i> Cad. Turmas
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="materias.html" id="link-materias">
+                            <i class="fas fa-book-open"></i> Cad. Matérias
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="listagem.html" id="link-listagem">
+                            <i class="fas fa-list-alt"></i> Listagem Geral
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="navbar">
+                <div class="navbar-left">
+                    <h1 class="page-title">Listagem Geral</h1>
+                </div>
+                <div class="navbar-right">
+                    <a href="home.html" class="btn btn-secondary" style="margin-right: 15px;">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+
+                    <div class="dropdown-container">
+                        <button class="profile-button" id="profile-button">U</button>
+                        <div class="dropdown-menu" id="profile-dropdown">
+                            <div class="profile-info">
+                                <strong id="nav-user-name">Carregando...</strong>
+                                <small id="nav-user-email">...</small>
+                                <span id="nav-user-role">...</span>
+                            </div>
+                            <a href="perfil.html" class="dropdown-item"><i class="fas fa-user-circle"></i> Meu
+                                Perfil</a>
+                            <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Configurações</a>
+                            <a href="#" id="btn-logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i>
+                                Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="card full-height-card" style="overflow-y: auto;">
+
+                <h3 style="color: #3f51b5; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+                    <i class="fas fa-user-graduate"></i> Listagem de Alunos
+                </h3>
+                <div class="table-container" style="margin-bottom: 40px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Matrícula</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-alunos">
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 style="color: #3f51b5; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+                    <i class="fas fa-chalkboard-teacher"></i> Listagem de Professores
+                </h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Disciplina</th>
+                                <th>Cargo</th>
+                                <th>ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-professores">
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </main>
     </div>
 
+    <script src="js/global.js"></script>
+    <script src="js/listagem.js"></script>
 </body>
 
-<script src="js/listagem.js"></script>
 </html>
