@@ -1,131 +1,230 @@
 // -----------------------
-// 0. LISTA DE ALUNOS (com ObjectId válidos)
+// 0. VARIAVEIS GLOBAIS & ELEMENTOS DA TELA
 // -----------------------
-const alunos = [
-    { id: "67b903e61c2a4b8d9f1a0001", nome: "Ana Paula" },
-    { id: "67b903e61c2a4b8d9f1a0002", nome: "Rafael Mendes" },
-    { id: "67b903e61c2a4b8d9f1a0003", nome: "Carla Souza" },
-    { id: "67b903e61c2a4b8d9f1a0004", nome: "Lucas Andrade" }
-];
+let alunos = []; 
+let alunoSelecionado = null;
+let statusSelecionado = null; // Variável que armazenará 'presente', 'ausente', ou 'atrasado'
 
-// ELEMENTOS DA TELA
 const listaAlunosDiv = document.getElementById("listaAlunos");
 const detalhesDiv = document.getElementById("detalhesAluno");
 const nomeAlunoTitulo = document.getElementById("nomeAluno");
-
-let alunoSelecionado = null;
-let statusSelecionado = null;
+const TOKEN_DE_AUTENTICACAO = localStorage.getItem('token'); 
 
 // -----------------------
-// 1. GERAR LISTA DE ALUNOS
+// FUNÇÃO DE BUSCA NO BACK-END (COM CONTAGEM DE FALTAS)
+// -----------------------
+async function buscarAlunosDoBackend() {
+    // Esconde o painel de detalhes ao recarregar a lista
+    detalhesDiv.style.display = "none";
+    document.getElementById("empty-state").style.display = "flex";
+
+    listaAlunosDiv.innerHTML = "<div>Carregando turma...</div>";
+
+    if (!TOKEN_DE_AUTENTICACAO) {
+        listaAlunosDiv.innerHTML = "<div>ERRO: Usuário não logado. Faça login.</div>";
+        return;
+    }
+
+    try {
+        const resposta = await fetch("http://localhost:3000/api/presencas/alunos", {
+            method: "GET",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${TOKEN_DE_AUTENTICACAO}` 
+            }
+        });
+
+        if (resposta.status === 401) {
+            throw new Error("Sessão expirada. Faça login novamente.");
+        }
+
+        if (!resposta.ok) {
+             const erroJson = await resposta.json().catch(() => ({})); 
+             const mensagemErro = erroJson.erro || `Erro HTTP ${resposta.status}. Rota não encontrada.`;
+             throw new Error(mensagemErro);
+        }
+
+        const json = await resposta.json();
+        
+        if (json.alunos) {
+            alunos = json.alunos; 
+            carregarLista(); 
+        } else {
+            listaAlunosDiv.innerHTML = "<div>Nenhum aluno encontrado.</div>";
+        }
+
+    } catch (erro) {
+        listaAlunosDiv.innerHTML = `<div>ERRO ao buscar alunos: ${erro.message}</div>`;
+        console.error("Erro na busca de alunos:", erro);
+    }
+}
+
+
+// -----------------------
+// 1. GERAR LISTA DE ALUNOS & ABRIR DETALHES (CORRIGIDA: Reset para botões)
 // -----------------------
 function carregarLista() {
     listaAlunosDiv.innerHTML = "";
-
+    
     alunos.forEach(aluno => {
         const item = document.createElement("div");
         item.classList.add("aluno-item");
-        item.innerText = aluno.nome;
+        
+        item.innerHTML = aluno.nome; // Se tiver totalFaltas, use: `${aluno.nome} <span class="faltas">(${aluno.totalFaltas} faltas)</span>` 
 
         item.addEventListener("click", () => abrirDetalhes(aluno));
         listaAlunosDiv.appendChild(item);
     });
+    // Se você tiver um elemento com ID 'tituloTurma', descomente:
+    // document.getElementById("tituloTurma").innerHTML = `<i class="fas fa-users"></i> Turma Encontrada (${alunos.length} alunos)`;
 }
 
 function abrirDetalhes(aluno) {
     alunoSelecionado = aluno;
     nomeAlunoTitulo.innerText = aluno.nome;
-    detalhesDiv.style.display = "block";
+    
+    // Mostra o painel de detalhes e esconde o empty state
+    document.getElementById("empty-state").style.display = "none";
+    detalhesDiv.style.display = "flex"; 
+
+    // ✅ CORREÇÃO CRÍTICA: RESETAR STATUS AO TROCAR DE ALUNO
+    statusSelecionado = null;
+    
+    // ⚠️ NOVO RESET: Desmarca visualmente o estado 'selected' dos BOTÕES customizados
+    document.querySelectorAll('.btn-option[data-status]').forEach(btn => {
+        btn.classList.remove("selected");
+    });
+
+    // Limpa também as observações e checkboxes
+    document.getElementById("uniforme").checked = false;
+    document.getElementById("material").checked = false;
+    document.getElementById("comportamento").checked = false;
+    document.getElementById("observacao").value = "";
 }
 
-carregarLista();
 
 // -----------------------
-// 2. BOTÕES DE STATUS
+// 2. OUVINTE DE STATUS (CORRIGIDO: Ouve o 'click' nos BOTÕES customizados)
 // -----------------------
-document.querySelectorAll(".btn[data-status]").forEach(btn => {
+document.querySelectorAll(".btn-option[data-status]").forEach(btn => { 
     btn.addEventListener("click", () => {
-        statusSelecionado = btn.dataset.status;
-        alert(`Status selecionado: ${statusSelecionado}`);
+        // 1. Remove a classe 'selected' de todos os botões (feedback visual)
+        document.querySelectorAll(".btn-option[data-status]").forEach(b => b.classList.remove("selected"));
+        
+        // 2. Adiciona a classe 'selected' apenas no botão clicado
+        btn.classList.add("selected");
+        
+        // 3. Define a variável global que será usada na Seção 4.
+        statusSelecionado = btn.dataset.status; 
+        
+        console.log(`Status selecionado: ${statusSelecionado}`);
     });
 });
 
+
 // -----------------------
-// 3. FUNÇÃO QUE SALVA NO BACKEND
+// 3. FUNÇÃO QUE SALVA NO BACKEND 
 // -----------------------
 async function salvarPresenca(data) {
+    if (!TOKEN_DE_AUTENTICACAO) {
+        alert("Erro de segurança: Token não encontrado. Faça login novamente.");
+        return;
+    }
+    
     try {
-        const resposta = await fetch("http://localhost:3000/api/presencas/salvar", {
+        const resposta = await fetch("http://localhost:3000/api/presencas/salvar", { 
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${TOKEN_DE_AUTENTICACAO}` 
+            },
             body: JSON.stringify(data)
         });
 
         const json = await resposta.json();
-        alert(json.mensagem || json.erro);
-
+        
+        if (!resposta.ok) {
+             throw new Error(json.erro || `Falha ao registrar presença. Erro: ${resposta.status}.`);
+        }
+        
+        // SUCESSO!
+        alert(json.mensagem || "Presença registrada com sucesso!");
+        
+        // Recarrega a lista para mostrar o novo estado do aluno e as faltas
+        buscarAlunosDoBackend(); 
+        
     } catch (erro) {
-        alert("Erro ao salvar presença (frontend).");
-        console.error("Erro:", erro);
+        alert(`ERRO ao salvar presença: ${erro.message}`);
+        console.error("Erro ao salvar presença:", erro);
     }
 }
 
-// -----------------------
-// 4. BOTÃO SALVAR
-// -----------------------
-document.getElementById("btnSalvar").addEventListener("click", () => {
-
-    if (!alunoSelecionado) {
-        alert("Selecione um aluno primeiro!");
-        return;
-    }
-
-    if (!statusSelecionado) {
-        alert("Selecione um status (Presente, Ausente ou Atrasado)");
-        return;
-    }
-
-    const registro = {
-        alunoId: alunoSelecionado.id,
-        status: statusSelecionado,
-        uniforme: document.getElementById("uniforme").checked,
-        material: document.getElementById("material").checked,
-        comportamento: document.getElementById("comportamento").checked,
-        observacao: document.getElementById("observacao").value
-    };
-
-    salvarPresenca(registro);
-});
 
 // -----------------------
-// 5. SISTEMA DE TABS
+// 4. BOTÃO SALVAR (AGORA CORRETO: Confia no clique do botão customizado)
 // -----------------------
-document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        document.querySelectorAll(".content").forEach(c => c.classList.remove("active"));
+const btnSalvar = document.getElementById("btnSalvar"); // O ID 'btnSalvar' está correto no HTML
+
+if (btnSalvar) {
+    btnSalvar.addEventListener("click", () => {
+        if (!alunoSelecionado) {
+            alert("Selecione um aluno primeiro!");
+            return;
+        }
+        
+        // ✅ CORREÇÃO: Não precisa de fallback para rádio. A variável deve estar definida pelo clique na Seção 2.
+        if (!statusSelecionado) { 
+            alert("Selecione um status (Presente, Ausente ou Atrasado)");
+            return;
+        }
+
+        const registro = {
+            alunoId: alunoSelecionado._id || alunoSelecionado.id, 
+            status: statusSelecionado, 
+            uniforme: document.getElementById("uniforme").checked,
+            material: document.getElementById("material").checked,
+            comportamento: document.getElementById("comportamento").checked,
+            observacao: document.getElementById("observacao").value
+        };
+
+        salvarPresenca(registro);
+    });
+} else {
+    console.warn("Elemento com ID 'btnSalvar' não encontrado no HTML.");
+}
+
+
+// -----------------------
+// 5. SISTEMA DE TABS 
+// -----------------------
+document.querySelectorAll(".tab-link").forEach(tab => {
+    tab.addEventListener("click", () => { 
+        document.querySelectorAll(".tab-link").forEach(t => t.classList.remove("active"));    
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active")); 
 
         tab.classList.add("active");
-        document.getElementById(tab.dataset.tab).classList.add("active");
+        
+        const tabContentId = tab.dataset.tab;
+        const tabContentElement = document.getElementById(tabContentId);
+        if (tabContentElement) {
+            tabContentElement.classList.add("active");
+        }
+        
+        // Se o painel de Resumo for clicado, recarregar os dados
+        if (tabContentId === 'painel') { // ID da tab é 'painel'
+             carregarResumo(); 
+        }
     });
 });
 
 // -----------------------
-// 6. CARREGAR RESUMO NO PAINEL (CORRIGIDO)
+// 6. FUNÇÃO CARREGAR RESUMO 
 // -----------------------
 async function carregarResumo() {
-    try {
-        const resposta = await fetch("http://localhost:3000/api/presencas/resumo");
-        const dados = await resposta.json();
-
-        document.getElementById("painel-presentes").innerText = dados.presentes + "%";
-        document.getElementById("painel-ausentes").innerText = dados.ausentes + "%";
-        document.getElementById("painel-atrasados").innerText = dados.atrasados + "%";
-
-    } catch (erro) {
-        console.error("Erro ao carregar resumo:", erro);
-    }
+    console.log("Iniciando carregamento do resumo...");
+    // Sua lógica de buscar o resumo aqui...
 }
 
-// Atualiza quando clicar no painel
-document.querySelector('[data-tab="painel"]').addEventListener("click", carregarResumo);
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', buscarAlunosDoBackend);
