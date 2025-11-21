@@ -1,60 +1,48 @@
 // server/utils/enviarEmailVerificacao.js
 const nodemailer = require("nodemailer");
 
-// 🚨 CORREÇÃO: Usando credenciais do arquivo .env
+// Lendo variáveis do .env
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
-const EMAIL_HOST = process.env.EMAIL_HOST || "smtp.gmail.com";
-const EMAIL_PORT = process.env.EMAIL_PORT || 587;
-const EMAIL_SECURE = process.env.EMAIL_SECURE === 'true'; 
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 async function enviarEmailVerificacao(email, token) {
-  if (!EMAIL_USER || !EMAIL_PASS) {
-      console.warn("⚠️ Credenciais de email não configuradas no .env. Email de verificação NÃO ENVIADO.");
-      return;
-  }
-    
   try {
-    // 1️⃣ Configuração do transportador
+    if (!EMAIL_USER || !EMAIL_PASS) {
+      console.warn("⚠️ EMAIL_USER ou EMAIL_PASS ausentes no .env!");
+      return { success: false, error: "Env vars ausentes" };
+    }
+
+    // Configuração do transportador Gmail
     const transporter = nodemailer.createTransport({
-      host: EMAIL_HOST,
-      port: EMAIL_PORT,
-      secure: EMAIL_SECURE,
+      service: "gmail",
       auth: {
-        user: EMAIL_USER,   
-        pass: EMAIL_PASS        
+        user: EMAIL_USER,
+        pass: EMAIL_PASS
       }
     });
 
-    // 2️⃣ Link de verificação
-    const link = `http://localhost:3000/auth/verify/${token}`;
-    console.log(`🔗 Link de verificação gerado: ${link}`);
+    // Link dinâmico para verificação
+    const link = `${FRONTEND_URL}/auth/verify/${token}`;
+    console.log("🔗 Link de verificação gerado:", link);
 
-    // 3️⃣ Envia o e-mail
-    const remetente = `Sistema Escolar <${EMAIL_USER}>`;
-    
-    const info = await transporter.sendMail({
-      from: remetente,
+    await transporter.sendMail({
+      from: `Sistema Escolar <${EMAIL_USER}>`,
       to: email,
       subject: "Verifique seu e-mail",
       html: `
         <h2>Confirme seu e-mail</h2>
         <p>Clique no link abaixo para ativar sua conta:</p>
-        <a href="${link}" style="color: blue; font-size: 18px;">
-          ${link}
-        </a>
-        <br><br>
-        <p>Se você não criou uma conta, ignore este e-mail.</p>
+        <a href="${link}" style="color: blue; font-size: 18px;">${link}</a>
+        <p>Se você não solicitou este e-mail, ignore-o.</p>
       `
     });
 
-    console.log("Mensagem enviada: %s", info.messageId);
-
     return { success: true };
 
-  } catch (error) {
-    console.error("Erro ao enviar e-mail de verificação:", error);
-    return { success: false, error: error.message };
+  } catch (err) {
+    console.error("❌ Erro ao enviar e-mail de verificação:", err);
+    return { success: false, error: err.message };
   }
 }
 

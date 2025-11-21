@@ -19,6 +19,7 @@ const alunoRoutes = require("./routes/alunoRoutes");
 const listagemRoutes = require("./routes/listagemRoutes");
 // 🛑 NOVO CÓDIGO: Importação das Rotas de Responsáveis 🛑
 const responsaveisRoutes = require("./routes/responsaveis"); 
+const eventosRoutes = require("./routes/eventosRoutes");
 
 // ==========================================
 // APP CONFIG
@@ -46,7 +47,7 @@ app.use("/materias", materiasRoutes);
 app.use("/turmas", turmaRoutes);
 app.use("/professores", professorRoutes);
 app.use("/alunos", alunoRoutes);
-
+app.use("/eventos", eventosRoutes);
 // 🛑 NOVO CÓDIGO: Uso das Rotas de Responsáveis 🛑
 app.use("/responsaveis", responsaveisRoutes);
 

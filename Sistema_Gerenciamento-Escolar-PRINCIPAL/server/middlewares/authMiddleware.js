@@ -1,47 +1,26 @@
-// server/middlewares/authMiddleware.js (CÓDIGO NOVO - Substitui o antigo auth.js)
 const jwt = require("jsonwebtoken");
-
-// 🚨 CORREÇÃO: Usando a chave secreta do arquivo .env
 const SECRET = process.env.JWT_SECRET;
 
-function authMiddleware(req, res, next) {
-    if (!SECRET) {
-        console.error("JWT_SECRET não está definido! O middleware de autenticação não funcionará.");
-        return res.status(500).json({ erro: "Configuração de segurança incompleta no servidor." });
-    }
-    
+module.exports = function (req, res, next) {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-        return res.status(401).json({ erro: "Token de autenticação não fornecido" });
-    }
+    if (!authHeader)
+        return res.status(401).json({ mensagem: "Token não enviado." });
 
-    const parts = authHeader.split(' ');
-    
-    if (parts.length !== 2 || parts[0].toLowerCase() !== 'bearer') {
-        return res.status(401).json({ erro: "Formato de token inválido (esperado: Bearer <token>)" });
-    }
+    const parts = authHeader.split(" ");
 
-    const token = parts[1];
+    if (parts.length !== 2)
+        return res.status(401).json({ mensagem: "Token inválido." });
 
-    try {
-        const decoded = jwt.verify(token, SECRET); 
-        
-        // Adiciona as informações decodificadas do usuário na requisição (id e tipo)
-        req.user = decoded; 
-        
-        return next();
-        
-    } catch (error) {
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ erro: "Token expirado. Faça login novamente." });
-        }
-        if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({ erro: "Token inválido." });
-        }
-        console.error("Erro no middleware de autenticação:", error);
-        return res.status(500).json({ erro: "Erro de autenticação interno." });
-    }
-}
+    const [scheme, token] = parts;
 
-module.exports = authMiddleware;
+    if (!/^Bearer$/i.test(scheme))
+        return res.status(401).json({ mensagem: "Token mal formatado." });
+
+    jwt.verify(token, SECRET, (err, decoded) => {
+        if (err) return res.status(401).json({ mensagem: "Token inválido ou expirado." });
+
+        req.user = { id: decoded.id, tipo: decoded.tipo };
+        next();
+    });
+};

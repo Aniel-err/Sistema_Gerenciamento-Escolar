@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/eventos.css">
+    <title>Eventos</title>
+</head>
+<body>
+    
+ <ul><li><a href="home.html" id="link-home"><i class="fas fa-chart-line"></i> Dashboard </a> </li></ul>
+    <h1>Eventos da Escola</h1>
+
+    <section id="form-section">
+        <h2>Criar / Editar Evento</h2>
+       
+        <form id="formEvento">
+            <input type="hidden" id="idEvento">
+
+            <label>Título:</label>
+            <input type="text" id="titulo" required>
+
+            <label>Descrição:</label>
+            <textarea id="descricao"></textarea>
+
+            <label>Data de Início:</label>
+            <input type="datetime-local" id="dataInicio" required>
+
+            <label>Data de Fim:</label>
+            <input type="datetime-local" id="dataFim">
+
+            <label>Local:</label>
+            <input type="text" id="local">
+
+            <label>Turmas (separadas por vírgula)</label>
+            <input type="text" id="turmas">
+
+            <button type="submit">Salvar</button>
+            <button type="button" id="btnLimpar">Limpar</button>
+        </form>
+    </section>
+
+    <section id="listaEventos">
+        <h2>Eventos</h2>
+        <div id="eventos"></div>
+    </section>
+
+    <script src="js/eventos.js"></script>
+</body>
+</html>
+ 
