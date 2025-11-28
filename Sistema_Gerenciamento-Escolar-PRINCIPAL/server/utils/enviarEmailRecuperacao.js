@@ -1,12 +1,9 @@
-// server/utils/enviarEmailRecuperacao.js
 const nodemailer = require("nodemailer");
 
-// 🚨 CORREÇÃO: Usando credenciais do arquivo .env
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 const EMAIL_HOST = process.env.EMAIL_HOST || "smtp.gmail.com";
 const EMAIL_PORT = process.env.EMAIL_PORT || 587;
-// Converte a string 'true' para booleano, ou assume false se não estiver definido
 const EMAIL_SECURE = process.env.EMAIL_SECURE === 'true'; 
 
 async function enviarEmailRecuperacao(email, link) {

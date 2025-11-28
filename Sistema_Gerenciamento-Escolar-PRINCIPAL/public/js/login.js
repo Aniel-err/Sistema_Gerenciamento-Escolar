@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const email = document.getElementById('email');
     const password = document.getElementById('senha'); 
 
-    // Modal elementos
     const modal = document.getElementById('modal-verificacao');
     const closeModal = document.getElementById('close-modal');
     const btnResend = document.getElementById('btn-resend');
@@ -32,17 +31,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
 
-            /* ===========================================================
-               🔥 SE O EMAIL NÃO ESTÁ VERIFICADO → ABRE A MODAL
-            ============================================================ */
+           
             if (response.status === 401 && data.mensagem.includes("Email não verificado")) {
                 modal.style.display = 'flex';
                 return;
             }
 
-            /* ===========================================================
-               🔥 LOGIN OK
-            ============================================================ */
+           
             if (response.ok) {
                 showMessage(data.mensagem, 'success');
 
@@ -56,9 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            /* ===========================================================
-               ❌ OUTROS ERROS DE LOGIN
-            ============================================================ */
+           
             showMessage(data.mensagem, 'error');
 
 
@@ -68,13 +61,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Fechar modal
     closeModal.addEventListener('click', () => {
         modal.style.display = 'none';
         resendMessage.innerHTML = '';
     });
 
-    // Clicar fora da modal fecha
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.style.display = 'none';
@@ -82,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Reenviar link de verificação
     btnResend.addEventListener('click', async () => {
         resendMessage.innerHTML = '';
         try {

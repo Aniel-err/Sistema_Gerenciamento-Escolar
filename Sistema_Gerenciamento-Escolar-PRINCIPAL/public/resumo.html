@@ -22,7 +22,6 @@
             gap: 20px;
             margin-top: 20px;
         }
-        /* Garantindo o visual dos cards do seu style.css */
         .card h4 { margin: 0; font-size: 1.1em; color: #6a737b; }
         .card h2 { margin-top: 5px; }
         .error-message { color: #f44336; font-weight: 600; margin-top: 15px; }
@@ -66,11 +65,9 @@
     <script>
         async function carregarResumoDedicatorio() {
             const statusElement = document.getElementById("loading-status");
-            // Adiciona um spinner para indicar que a atualização está ocorrendo
             statusElement.innerHTML = `<i class="fas fa-sync fa-spin"></i> Atualizando dados...`; 
 
             try {
-                // Chamada à rota do seu Back-end que já está funcionando
                 const resposta = await fetch("http://localhost:3000/api/presencas/resumo");
                 
                 if (!resposta.ok) {
@@ -79,12 +76,10 @@
 
                 const dados = await resposta.json();
 
-                // Preencher as porcentagens
                 document.getElementById("painel-presentes").innerText = dados.presentes + "%";
                 document.getElementById("painel-ausentes").innerText = dados.ausentes + "%";
                 document.getElementById("painel-atrasados").innerText = dados.atrasados + "%";
                 
-                // Adiciona a hora da última atualização para feedback visual
                 const agora = new Date().toLocaleTimeString('pt-BR');
                 statusElement.innerHTML = `<i class="fas fa-check-circle" style="color: #4CAF50;"></i> Dados carregados com sucesso! (Total de registros: ${dados.total}) - Última atualização: ${agora}`;
 
@@ -98,11 +93,8 @@
             }
         }
 
-        // 1. Executa a função ao carregar a página (primeira carga)
         carregarResumoDedicatorio();
 
-        // 2. Configura a atualização automática (Polling) a cada 10 segundos
-        // O valor 10000 é 10 segundos em milissegundos.
         setInterval(carregarResumoDedicatorio, 10000); 
     </script>
 </body>

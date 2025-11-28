@@ -1,49 +1,39 @@
-// Função para marcar o link correto na Sidebar como ativo
 function setActiveLink() {
-    // Pega o caminho do arquivo atual (ex: /public/responsaveis.html)
     const currentPath = window.location.pathname;
     
-    // Encontra todos os links da Sidebar
     const links = document.querySelectorAll('.sidebar-nav ul li a');
 
     links.forEach(link => {
-        // 1. Remove a classe 'active' de todos os links (Passo necessário)
         link.classList.remove('active');
 
-        // 2. Tenta ativar o link que corresponde à URL atual
         if (currentPath.includes(link.getAttribute('href'))) {
             link.classList.add('active');
         } 
-        // 3. 🛑 AQUI ESTÁ A LÓGICA CORRETA PARA RESPONSÁVEIS 🛑
-        // Se a página atual é 'responsaveis.html', destacamos o link de 'Alunos & Funcionários' (o grupo principal)
+   
         else if (currentPath.includes('responsaveis.html') && link.getAttribute('href') === 'alunos.html') {
              link.classList.add('active');
         }
     });
 }
 
-// Chame a função logo que o DOM for carregado
 setActiveLink();
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Variáveis de Configuração e DOM
     const token = localStorage.getItem('token'); 
     const API_BASE_URL = 'http://localhost:3000';
     
-    // Referências aos elementos do DOM (IDs do HTML)
     const corpoTabela = document.getElementById('corpoTabelaResponsaveis');
     const formCadastro = document.getElementById('formCadastroResponsavel');
     const inputNome = document.getElementById('nome');
     const inputEmail = document.getElementById('email');
     const inputTelefone = document.getElementById('telefone');
-    const inputAlunoId = document.getElementById('alunoId'); // Campo chave
+    const inputAlunoId = document.getElementById('alunoId');
     const btnSalvar = formCadastro.querySelector('button[type="submit"]');
 
     let isEditing = false;
     let currentResponsavelId = null;
 
-    // Função principal para buscar e listar os responsáveis (GET)
     async function listarResponsaveis() {
         try {
             if (!token) {
@@ -80,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
             responsaveis.forEach(responsavel => {
                 const tr = document.createElement('tr');
                 
-                // Trata o nome do Aluno: usa o nome (se populado) ou o ID (se não populado)
                 const nomeAluno = responsavel.aluno ? responsavel.aluno.nome || responsavel.aluno : 'N/A';
                 
                 tr.innerHTML = `
@@ -95,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 corpoTabela.appendChild(tr);
             });
             
-            // 2. Lógica de Exclusão (DELETE)
             document.querySelectorAll('.btn-excluir').forEach(button => {
                 button.addEventListener('click', async (e) => {
                     const responsavelId = e.target.getAttribute('data-id');
@@ -124,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
-            // 3. Lógica para Iniciar a Edição (Preenche o Formulário)
             document.querySelectorAll('.btn-editar').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const responsavelId = e.target.getAttribute('data-id');
@@ -134,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         inputNome.value = responsavel.nome;
                         inputEmail.value = responsavel.email;
                         inputTelefone.value = responsavel.telefone || '';
-                        // Pega o ID do aluno vinculado
                         inputAlunoId.value = responsavel.aluno && responsavel.aluno._id ? responsavel.aluno._id : responsavel.aluno;
 
                         isEditing = true;
@@ -151,12 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Chama a função ao carregar a página
     listarResponsaveis();
 
-    /* **********************************************
-     * Lógica de Cadastro/Edição (POST e PUT)
-     ********************************************** */
+
     formCadastro.addEventListener('submit', async (event) => {
         event.preventDefault(); 
 
@@ -164,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
             nome: inputNome.value,
             email: inputEmail.value,
             telefone: inputTelefone.value,
-            // O Backend espera um ID do aluno (ObjectId)
             alunoMatricula: inputAlunoId.value 
         };
 

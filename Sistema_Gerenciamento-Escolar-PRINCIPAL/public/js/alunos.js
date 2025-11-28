@@ -1,30 +1,20 @@
-// public/js/alunos.js
-
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('token');
     const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
     const isAdmin = usuarioLogado && usuarioLogado.tipo === 'admin';
-    const API_BASE_URL = 'http://localhost:3000'; // Define a URL base para facilitar
+    const API_BASE_URL = 'http://localhost:3000';
 
-    // Container de Botões do Header
     const btnContainer = document.getElementById('btnContainer');
 
-    // Elementos DOM
     const modalAluno = document.getElementById('modalAluno');
     const modalProfessor = document.getElementById('modalProfessor');
-    
-    // ============================================================
-    // ⚙️ FUNÇÕES GERAIS E UTILS
-    // ============================================================
-
-    // Função para redirecionar para a página de cadastro de responsáveis
+ 
     window.irParaCadastroResponsaveis = () => {
         window.location.href = 'responsaveis.html';
     };
 
-    // --- BOTÕES DE AÇÃO ---
     function atualizarBotoesHeader(abaAtiva) {
-        btnContainer.innerHTML = ''; // Limpa
+        btnContainer.innerHTML = '';
 
         if (abaAtiva === 'tab-alunos') {
             const btn = document.createElement('button');
@@ -38,59 +28,50 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.innerHTML = '<i class="fas fa-plus"></i> Novo Professor';
             btn.onclick = () => openModal(modalProfessor);
             btnContainer.appendChild(btn);
-        } else if (abaAtiva === 'tab-responsaveis') { // ADICIONADO: Botão para Responsáveis
+        } else if (abaAtiva === 'tab-responsaveis') { 
             const btn = document.createElement('button');
             btn.className = 'btn btn-primary';
-            btn.style.backgroundColor = '#1abc9c'; // Cor verde para Novo Responsável
+            btn.style.backgroundColor = '#1abc9c';
             btn.style.borderColor = '#1abc9c';
             btn.innerHTML = '<i class="fas fa-plus"></i> Novo Responsável';
-            btn.onclick = () => irParaCadastroResponsaveis(); // Chama a função de redirecionamento
+            btn.onclick = () => irParaCadastroResponsaveis();
             btnContainer.appendChild(btn);
         }
     }
 
-    // --- SISTEMA DE ABAS ---
     document.querySelectorAll('.tab-link').forEach(link => {
         link.addEventListener('click', () => {
-            // Remove active
             document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
-            // Adiciona active
             link.classList.add('active');
             const tabId = link.dataset.tab;
             document.getElementById(tabId).classList.add('active');
 
-            // Atualiza botão do topo
             atualizarBotoesHeader(tabId);
             
-            // Carrega dados ao trocar de aba
             if (tabId === 'tab-alunos') {
                 carregarAlunos();
             } else if (tabId === 'tab-professores') {
                 carregarProfessores();
             } else if (tabId === 'tab-responsaveis') { 
-                carregarResponsaveis(); // Chama a função de listagem de Responsáveis
+                carregarResponsaveis(); 
             }
         });
     });
 
-    // --- MODAIS ---
     function openModal(modal) { modal.classList.add('show'); }
     function closeModal(modal) { 
         modal.classList.remove('show'); 
         modal.querySelector('form').reset();
     }
 
-    // Eventos de Fechar
     document.getElementById('closeModalAluno').onclick = () => closeModal(modalAluno);
     document.getElementById('cancelModalAluno').onclick = () => closeModal(modalAluno);
     document.getElementById('closeModalProf').onclick = () => closeModal(modalProfessor);
     document.getElementById('cancelModalProf').onclick = () => closeModal(modalProfessor);
 
-    // ============================================================
-    // 🎓 LÓGICA DE ALUNOS
-    // ============================================================
+
     async function carregarAlunos() {
         try {
             const res = await fetch(`${API_BASE_URL}/alunos`, {
@@ -148,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function() {
         carregarAlunos();
     };
 
-    // Carregar Turmas para o Select
     async function carregarTurmasSelect() {
         const res = await fetch(`${API_BASE_URL}/turmas`, { headers: { 'Authorization': `Bearer ${token}` } });
         const turmas = await res.json();
@@ -161,9 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ============================================================
-    // 👨‍🏫 LÓGICA DE PROFESSORES
-    // ============================================================
     async function carregarProfessores() {
         try {
             const res = await fetch(`${API_BASE_URL}/professores`, {
@@ -200,7 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 tbody.appendChild(tr);
             });
 
-            // Esconde colunas de admin se não for admin
             if (!isAdmin) {
                 document.querySelectorAll('.admin-only-col').forEach(el => el.style.display = 'none');
             }
@@ -224,7 +200,6 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ cargo: novoCargo })
         });
-        // Não precisa recarregar tudo, o switch já mudou visualmente
         alert(`Cargo alterado para ${novoCargo}`);
     };
 
@@ -254,11 +229,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // ============================================================
-    // 👪 LÓGICA DE RESPONSÁVEIS (Listar e Deletar)
-    // ============================================================
-    
-    // Função para deletar (agora acessível globalmente)
     window.deletarResponsavel = async (id) => {
         if (!confirm('Tem certeza que deseja remover este responsável?')) return;
         try {
@@ -268,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             if (res.ok) {
                 alert('Responsável removido com sucesso!');
-                carregarResponsaveis(); // Recarrega a lista após a exclusão
+                carregarResponsaveis();
             } else {
                 alert('Erro ao deletar responsável.');
             }
@@ -311,19 +281,15 @@ document.addEventListener('DOMContentLoaded', function() {
             responsaveis.forEach(responsavel => {
                 const tr = document.createElement('tr');
                 
-                // 💡 CORREÇÃO APLICADA: Acessamos o objeto aluno populado (responsavel.aluno)
                 const alunoVinculado = responsavel.aluno; 
                 
                 let alunoVinculadoTexto = 'N/A';
                 
                 if (alunoVinculado && alunoVinculado.nome && alunoVinculado.matricula) {
-                    // Formato: Nome do Aluno (Matrícula)
                     alunoVinculadoTexto = `${alunoVinculado.nome} (${alunoVinculado.matricula})`;
                 } else if (alunoVinculado && alunoVinculado.matricula) {
-                    // Caso o nome não venha, mostra apenas a Matrícula
                     alunoVinculadoTexto = alunoVinculado.matricula;
                 } else if (responsavel.alunoMatricula) { 
-                    // Fallback se o backend não estiver populando corretamente, mas estiver mandando a matrícula solta
                     alunoVinculadoTexto = responsavel.alunoMatricula;
                 }
 
@@ -348,9 +314,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    // INICIALIZAÇÃO: Carrega os dados iniciais e configura o botão do header.
     carregarAlunos();
     carregarTurmasSelect();
     carregarProfessores();
-    atualizarBotoesHeader('tab-alunos'); // Começa na aba alunos
+    atualizarBotoesHeader('tab-alunos');
 });

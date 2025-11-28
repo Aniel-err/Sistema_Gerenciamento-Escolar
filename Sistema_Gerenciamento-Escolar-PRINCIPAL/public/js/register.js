@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         messageContainer.innerHTML = '';
 
-        // --- VALIDAÇÕES ---
         if (password.value !== confirmPassword.value) {
             showMessage('As senhas não coincidem.', 'error');
             return;
@@ -22,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // --- ENVIO PARA O BACKEND ---
         try {
             const response = await fetch('http://localhost:3000/auth/register', {
                 method: 'POST',
@@ -39,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
 
             if (response.ok) {
-                // SUCESSO - USUÁRIO CRIADO E E-MAIL DE VERIFICAÇÃO FOI ENVIADO
                 showMessage(
                     "Conta criada com sucesso! Verifique seu e-mail para ativar sua conta.",
                     'success'
@@ -47,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 registerForm.reset();
             } else {
-                // ERRO DO SERVIDOR (ex: "Email já cadastrado")
                 showMessage(data.mensagem, 'error');
             }
 
@@ -57,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Função para exibir mensagens
     function showMessage(messageText, messageType) {
         const messageElement = document.createElement('div');
         messageElement.className = 'message ' + messageType;

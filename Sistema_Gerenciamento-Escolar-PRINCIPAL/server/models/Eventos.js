@@ -6,7 +6,7 @@ const EventoSchema = new mongoose.Schema({
     dataInicio: { type: Date, required: true },
     dataFim: { type: Date },
     local: { type: String },
-    turmas: [{ type: String }], // lista de turmas afetadas
+    turmas: [{ type: String }], 
     criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: "Usuarios" },
     status: {
         type: String,

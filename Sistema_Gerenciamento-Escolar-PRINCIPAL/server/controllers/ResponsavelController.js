@@ -1,18 +1,11 @@
-// server/controllers/ResponsavelController.js
-
 const Responsavel = require('../models/Responsavel');
 const Aluno = require('../models/Aluno'); 
 
 class ResponsavelController {
-    
-    // ==========================================================
-    // CADASTRAR RESPONSÁVEL (Salva o ID do Aluno)
-    // ==========================================================
     async cadastrarResponsavel(req, res) {
         const { nome, email, telefone, alunoIdentificador } = req.body; 
 
         try {
-            // Busca o Aluno pelo identificador (Matrícula, Email ou ID)
             const alunoEncontrado = await Aluno.findOne({
                 $or: [{ matricula: alunoIdentificador }, { email: alunoIdentificador }, { _id: alunoIdentificador }]
             });
@@ -21,7 +14,6 @@ class ResponsavelController {
                 return res.status(404).json({ mensagem: 'Aluno não encontrado. Verifique a matrícula/email.' });
             }
             
-            // Cria o novo responsável com a referência ID
             const novoResponsavel = new Responsavel({
                 nome, email, telefone, 
                 aluno: alunoEncontrado._id 
@@ -39,12 +31,8 @@ class ResponsavelController {
         }
     }
 
-    // ==========================================================
-    // LISTAR RESPONSÁVEIS (Usa .populate() para trazer o nome)
-    // ==========================================================
-    async listarResponsaveis(req, res) {
+      async listarResponsaveis(req, res) {
         try {
-            // ✅ CORREÇÃO CRUCIAL: Traz os dados do aluno.
             const responsaveis = await Responsavel.find({})
                 .populate('aluno', 'nome matricula email') 
                 .select('-__v')
@@ -57,9 +45,6 @@ class ResponsavelController {
         }
     }
     
-    // ==========================================================
-    // ATUALIZAR RESPONSÁVEL
-    // ==========================================================
     async atualizarResponsavel(req, res) {
         try {
             const responsavelAtualizado = await Responsavel.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
@@ -72,9 +57,7 @@ class ResponsavelController {
         }
     }
     
-    // ==========================================================
-    // DELETAR RESPONSÁVEL
-    // ==========================================================
+
     async deletarResponsavel(req, res) {
         try {
             const responsavelDeletado = await Responsavel.findByIdAndDelete(req.params.id);

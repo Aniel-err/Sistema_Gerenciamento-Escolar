@@ -1,14 +1,10 @@
-// server/routes/materiasRoutes.js (CORRIGIDO)
 const express = require("express");
-const auth = require("../middlewares/authMiddleware"); // 🚨 CORREÇÃO: Nome do arquivo
+const auth = require("../middlewares/authMiddleware");
 const Materia = require("../models/Materia");
 
 const router = express.Router();
 
-/**
- * Criar disciplina
- * Apenas COORDENADOR ou ADMIN pode criar
- */
+
 router.post("/", auth, async (req, res) => {
   try {
     if (req.user.tipo !== "coordenador" && req.user.tipo !== "admin") {
@@ -25,9 +21,7 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-/**
- * Listar disciplinas
- */
+
 router.get("/", auth, async (req, res) => {
   try {
     const materias = await Materia.find().populate('professor', 'nome'); 
@@ -38,10 +32,6 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-/**
- * Atualizar uma disciplina
- * Apenas COORDENADOR ou ADMIN pode editar
- */
 router.put("/:id", auth, async (req, res) => {
   try {
     if (req.user.tipo !== "coordenador" && req.user.tipo !== "admin") {
@@ -61,10 +51,7 @@ router.put("/:id", auth, async (req, res) => {
   }
 });
 
-/**
- * Deletar disciplina
- * Apenas COORDENADOR ou ADMIN pode deletar
- */
+
 router.delete("/:id", auth, async (req, res) => {
   try {
     if (req.user.tipo !== "coordenador" && req.user.tipo !== "admin") {

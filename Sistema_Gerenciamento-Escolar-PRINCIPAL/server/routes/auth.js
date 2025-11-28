@@ -1,4 +1,3 @@
-// server/routes/auth.js
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
@@ -14,7 +13,6 @@ const fs = require("fs");
 const SECRET = process.env.JWT_SECRET;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
-// --- Configuração de upload ---
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const dir = "uploads/";
@@ -27,9 +25,7 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage });
-// --------------------------------
 
-// 1. REGISTRO
 router.post("/register", async (req, res) => {
     try {
         const usuario = await Usuario.create(req.body);
@@ -54,7 +50,6 @@ router.post("/register", async (req, res) => {
     }
 });
 
-// 2. LOGIN
 router.post("/login", async (req, res) => {
     const { email, senha } = req.body;
 
@@ -98,7 +93,6 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// 3. UPDATE DE PERFIL (COM FOTO)
 router.put("/update", auth, upload.single("foto"), async (req, res) => {
     try {
         const userId = req.user.id;
@@ -131,7 +125,6 @@ router.put("/update", auth, upload.single("foto"), async (req, res) => {
     }
 });
 
-// 4. VERIFICAÇÃO DE EMAIL
 router.get("/verify/:token", async (req, res) => {
     try {
         const usuario = await Usuario.findOne({ tokenVerificacao: req.params.token });
@@ -149,7 +142,6 @@ router.get("/verify/:token", async (req, res) => {
     }
 });
 
-// 5. REENVIAR LINK DE VERIFICAÇÃO
 router.post("/resend-verification", async (req, res) => {
     try {
         const { email } = req.body;
@@ -181,7 +173,6 @@ router.post("/resend-verification", async (req, res) => {
     }
 });
 
-// 6. ESQUECI A SENHA
 router.post("/forgot-password", async (req, res) => {
     try {
         const { email } = req.body;
@@ -190,7 +181,7 @@ router.post("/forgot-password", async (req, res) => {
         if (usuario) {
             const token = crypto.randomBytes(32).toString("hex");
             usuario.resetPasswordToken = token;
-            usuario.resetPasswordExpires = Date.now() + 3600000; // 1 hora
+            usuario.resetPasswordExpires = Date.now() + 3600000; 
             await usuario.save();
 
             const link = `${FRONTEND_URL}/auth/reset-password/${token}`;
@@ -205,7 +196,6 @@ router.post("/forgot-password", async (req, res) => {
     }
 });
 
-// 7. FORMULÁRIO DE RESET DE SENHA
 router.get("/reset-password/:token", async (req, res) => {
     res.send(`
         <form method="POST" action="/auth/reset-password/${req.params.token}">
@@ -215,7 +205,6 @@ router.get("/reset-password/:token", async (req, res) => {
     `);
 });
 
-// 8. RESET DE SENHA
 router.post("/reset-password/:token", async (req, res) => {
     try {
         const usuario = await Usuario.findOne({

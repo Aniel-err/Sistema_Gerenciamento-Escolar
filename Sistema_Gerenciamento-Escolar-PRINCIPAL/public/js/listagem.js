@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
 
-    // ---------------- ALUNOS ----------------
     try {
         const resAlunos = await fetch("http://localhost:3000/listagem/alunos");
         const alunos = await resAlunos.json();
@@ -22,7 +21,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Erro ao listar alunos:", err);
     }
 
-    // ---------------- PROFESSORES ----------------
     try {
         const resProfs = await fetch("http://localhost:3000/listagem/professores");
         const profs = await resProfs.json();

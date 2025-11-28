@@ -17,12 +17,10 @@ const UsuarioSchema = new mongoose.Schema(
 
     foto: { type: String, default: null },
 
-    // 🔹 VERIFICAÇÃO DE EMAIL
     emailVerificado: { type: Boolean, default: false },
     tokenVerificacao: { type: String, default: null },
-    tokenVerificacaoExpira: { type: Date, default: null }, // NOVO CAMPO
+    tokenVerificacaoExpira: { type: Date, default: null }, 
 
-    // 🔹 RECUPERAÇÃO DE SENHA
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null }
   },
@@ -32,7 +30,6 @@ const UsuarioSchema = new mongoose.Schema(
   }
 );
 
-// 🔐 Criptografa a senha antes de salvar
 UsuarioSchema.pre('save', async function (next) {
   if (!this.isModified('senha')) return next();
   const salt = await bcrypt.genSalt(10);
@@ -40,7 +37,6 @@ UsuarioSchema.pre('save', async function (next) {
   next();
 });
 
-// 🔍 Método para verificar senha
 UsuarioSchema.methods.verificarSenha = async function (senhaDigitada) {
   if (!this.senha) {
     const usuario = await this.constructor.findById(this._id).select('+senha');
@@ -49,12 +45,11 @@ UsuarioSchema.methods.verificarSenha = async function (senhaDigitada) {
   return bcrypt.compare(senhaDigitada, this.senha);
 };
 
-// 🔹 Método para gerar token de verificação
 UsuarioSchema.methods.gerarTokenVerificacao = function () {
   const token = crypto.randomBytes(32).toString('hex');
   this.tokenVerificacao = token;
-  this.tokenVerificacaoExpira = Date.now() + 3600000; // 1 hora
-  this.save(); // salva o token no DB
+  this.tokenVerificacaoExpira = Date.now() + 3600000; 
+  this.save(); 
   return token;
 };
 

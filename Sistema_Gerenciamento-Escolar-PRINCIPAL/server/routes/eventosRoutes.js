@@ -4,7 +4,6 @@ const router = express.Router();
 const auth = require("../middlewares/authMiddleware");
 const controller = require("../controllers/eventosController");
 
-// TODAS AS ROTAS PRECISAM DE TOKEN
 router.use(auth);
 
 router.post("/", controller.criarEvento);

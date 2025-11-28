@@ -1,7 +1,5 @@
-// server/utils/enviarEmailVerificacao.js
 const nodemailer = require("nodemailer");
 
-// Lendo variáveis do .env
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
@@ -13,7 +11,6 @@ async function enviarEmailVerificacao(email, token) {
       return { success: false, error: "Env vars ausentes" };
     }
 
-    // Configuração do transportador Gmail
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -22,7 +19,6 @@ async function enviarEmailVerificacao(email, token) {
       }
     });
 
-    // Link dinâmico para verificação
     const link = `${FRONTEND_URL}/auth/verify/${token}`;
     console.log("🔗 Link de verificação gerado:", link);
 

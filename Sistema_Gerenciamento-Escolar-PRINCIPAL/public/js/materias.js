@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Variáveis de Configuração e DOM
     const token = localStorage.getItem('token'); 
     const API_BASE_URL = 'http://localhost:3000';
     
-    // Referências aos elementos do DOM
     const corpoTabela = document.getElementById('corpoTabelaMaterias');
     const formCadastro = document.getElementById('formCadastroMateria');
     const inputNome = document.getElementById('nome');
@@ -13,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let isEditing = false;
     let currentMateriaId = null;
 
-    // Função principal para buscar e listar as matérias (GET)
     async function listarMaterias() {
         try {
             if (!token) {
@@ -50,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
             materias.forEach(materia => {
                 const tr = document.createElement('tr');
                 
-                // Trata o nome do professor: usa o nome (se populado) ou o ID (se não populado) ou 'N/A'
                 const nomeProfessor = materia.professor ? materia.professor.nome || materia.professor : 'N/A';
                 
                 tr.innerHTML = `
@@ -64,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 corpoTabela.appendChild(tr);
             });
             
-            // 2. Lógica de Exclusão (DELETE)
             document.querySelectorAll('.btn-excluir').forEach(button => {
                 button.addEventListener('click', async (e) => {
                     const materiaId = e.target.getAttribute('data-id');
@@ -93,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
-            // 3. Lógica para Iniciar a Edição (Preenche o Formulário)
             document.querySelectorAll('.btn-editar').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const materiaId = e.target.getAttribute('data-id');
@@ -101,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (materia) {
                         inputNome.value = materia.nome;
-                        // Se o professor foi populado (objeto), usa o ID para edição
                         inputProfessor.value = materia.professor && materia.professor._id ? materia.professor._id : materia.professor;
 
                         isEditing = true;
@@ -118,12 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Chama a função ao carregar a página
     listarMaterias();
 
-    /* **********************************************
-     * Lógica de Cadastro/Edição (POST e PUT)
-     ********************************************** */
     formCadastro.addEventListener('submit', async (event) => {
         event.preventDefault(); 
 

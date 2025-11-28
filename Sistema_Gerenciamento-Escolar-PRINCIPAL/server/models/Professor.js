@@ -1,4 +1,3 @@
-// server/models/Professor.js
 const mongoose = require('mongoose');
 
 const ProfessorSchema = new mongoose.Schema({
@@ -12,17 +11,14 @@ const ProfessorSchema = new mongoose.Schema({
   },
   disciplina: String,
   
-  // --- ADICIONADO PARA LIGAR AO LOGIN ---
-  // Assim, quando um 'professor' logar, saberemos que é este perfil
+
   usuarioId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usuario',
     required: true,
     unique: true
   }
-  // -----------------------------------
   
-  // 'turma' foi removido daqui. É melhor gerenciado pelo model 'Turma'.
 
 }, { versionKey: false });
 

@@ -22,14 +22,13 @@ async function api(url, metodo = "GET", corpo = null) {
     return resposta.json();
 }
 
-// Carregar eventos
 async function carregarEventos() {
     try {
         const eventos = await api("http://localhost:3000/eventos");
 
         console.log("Eventos carregados:", eventos);
 
-        const lista = document.getElementById("eventos"); // CORRIGIDO
+        const lista = document.getElementById("eventos"); 
         lista.innerHTML = "";
 
         eventos.forEach(ev => {
@@ -57,7 +56,6 @@ async function carregarEventos() {
     }
 }
 
-// SALVAR EVENTO
 document.getElementById("formEvento").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -88,7 +86,6 @@ document.getElementById("formEvento").addEventListener("submit", async (e) => {
     }
 });
 
-// EDITAR
 window.editar = async function (id) {
     try {
         const ev = await api(`http://localhost:3000/eventos/${id}`);
@@ -106,7 +103,6 @@ window.editar = async function (id) {
     }
 };
 
-// DELETAR
 window.deletarEvento = async function (id) {
     if (!confirm("Deseja excluir?")) return;
 

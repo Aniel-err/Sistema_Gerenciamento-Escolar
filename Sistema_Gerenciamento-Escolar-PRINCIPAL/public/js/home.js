@@ -1,26 +1,17 @@
-// public/js/home.js
-
 document.addEventListener('DOMContentLoaded', function() {
     
-    // --- GRÁFICOS (GOOGLE CHARTS) ---
-    // A lógica de menu/perfil foi movida para global.js para evitar conflitos.
-
-    // 1. Carrega o Google Charts
+   
     google.charts.load('current', {'packages':['corechart']});
 
-    // 2. Define uma função para chamar QUANDO os gráficos estiverem prontos
     google.charts.setOnLoadCallback(drawAllCharts);
 
-    // 3. Função principal que desenha tudo
     function drawAllCharts() {
         drawMonthlyPerformance();
         drawWeeklyFrequency();
         drawGradesDistribution();
     }
 
-    // --- GRÁFICO 1: Performance Mensal (Linha) ---
     function drawMonthlyPerformance() {
-        // Dados simulados (Futuramente virão do backend)
         const data = google.visualization.arrayToDataTable([
             ['Mês', 'Média Geral', { role: 'style' }],
             ['Jan', 7.2, 'point { size: 6; shape-type: circle; fill-color: #3f51b5; }'],
@@ -33,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const options = {
             legend: { position: 'none' },
-            colors: ['#3f51b5'], // Azul primário
+            colors: ['#3f51b5'], 
             vAxis: { 
                 title: 'Média', 
                 minValue: 6, 
@@ -52,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
         chart.draw(data, options);
     }
 
-    // --- GRÁFICO 2: Frequência Semanal (Barras Empilhadas) ---
     function drawWeeklyFrequency() {
         const data = google.visualization.arrayToDataTable([
             ['Dia', 'Presentes', 'Faltas'],
@@ -66,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const options = {
             legend: { position: 'top' },
             isStacked: true,
-            colors: ['#4CAF50', '#f44336'], // Verde para presentes, Vermelho para faltas
+            colors: ['#4CAF50', '#f44336'], 
             vAxis: { 
                 gridlines: { color: '#eee' }
             },
@@ -81,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
         chart.draw(data, options);
     }
 
-    // --- GRÁFICO 3: Distribuição de Notas (Rosca/Doughnut) ---
     function drawGradesDistribution() {
         const data = google.visualization.arrayToDataTable([
             ['Desempenho', 'Porcentagem'],
@@ -92,10 +81,10 @@ document.addEventListener('DOMContentLoaded', function() {
         ]);
 
         const options = {
-            pieHole: 0.7, // Controla o "buraco" no meio
+            pieHole: 0.7, 
             legend: { position: 'bottom' },
             colors: ['#4CAF50', '#2196F3', '#ffeb3b', '#f44336'],
-            pieSliceText: 'none', // Remove o texto de dentro das fatias
+            pieSliceText: 'none',
             chartArea: { left: 10, top: 20, width: '95%', height: '75%' }
         };
 
@@ -103,6 +92,5 @@ document.addEventListener('DOMContentLoaded', function() {
         chart.draw(data, options);
     }
 
-    // Para o caso de redimensionar a janela (Google Charts precisa disso)
     window.onresize = drawAllCharts;
 });

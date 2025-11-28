@@ -1,5 +1,3 @@
-// server/models/Responsavel.js
-
 const mongoose = require('mongoose');
 
 const responsavelSchema = new mongoose.Schema({
@@ -19,12 +17,11 @@ const responsavelSchema = new mongoose.Schema({
         required: false, 
         trim: true 
     },
-    // ✅ CAMPO CORRIGIDO: Usa referência ao modelo 'Aluno'
     aluno: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Aluno', 
         required: true,
-        unique: true // Garante um responsável principal por aluno
+        unique: true 
     }
 }, { timestamps: true });
 

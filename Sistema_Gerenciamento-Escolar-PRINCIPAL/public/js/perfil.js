@@ -1,5 +1,3 @@
-// public/js/perfil.js
-
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('token');
     const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
@@ -13,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const fotoInput = document.getElementById('fotoInput');
     const previewAvatar = document.getElementById('previewAvatar');
 
-    // 1. PREENCHER CAMPOS COM DADOS ATUAIS
     if (usuarioLogado) {
         nomeInput.value = usuarioLogado.nome;
         emailInput.value = usuarioLogado.email;
@@ -22,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
         atualizarPreviewFoto(usuarioLogado);
     }
 
-    // 2. PRÉ-VISUALIZAÇÃO DA FOTO QUANDO O USUÁRIO SELECIONA
     fotoInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -34,17 +30,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 3. ENVIAR FORMULÁRIO (UPDATE)
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // Validação de Senha
         if (senhaInput.value && senhaInput.value !== confirmaInput.value) {
             alert("As senhas não coincidem!");
             return;
         }
 
-        // Prepara o FormData (Necessário para enviar arquivos)
         const formData = new FormData();
         formData.append('nome', nomeInput.value);
         
@@ -61,8 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`
-                    // NÃO adicione 'Content-Type': 'application/json' aqui, 
-                    // pois o FormData configura automaticamente o multipart/form-data
+                 
                 },
                 body: formData
             });
@@ -72,10 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok) {
                 alert("Perfil atualizado com sucesso!");
                 
-                // Atualiza o localStorage com os novos dados
                 localStorage.setItem('usuario', JSON.stringify(data.usuario));
 
-                // Recarrega a página para atualizar o menu e tudo mais
                 window.location.reload();
             } else {
                 alert(data.mensagem || "Erro ao atualizar.");
@@ -87,20 +77,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Função Auxiliar: Mostra Foto ou Inicial
     function atualizarPreviewFoto(usuario) {
         if (usuario.foto) {
-            // O backend retorna caminho tipo "uploads\arquivo.jpg". Precisamos ajustar para URL.
-            // Se rodando localmente, o servidor serve 'uploads' na raiz
+           
             const fotoUrl = 'http://localhost:3000/' + usuario.foto;
             previewAvatar.innerHTML = `<img src="${fotoUrl}" alt="Foto Perfil">`;
             
-            // Atualiza também o ícone pequeno do menu superior (opcional)
             const navAvatar = document.getElementById('profile-button');
             if(navAvatar) {
                 navAvatar.style.backgroundImage = `url('${fotoUrl}')`;
                 navAvatar.style.backgroundSize = 'cover';
-                navAvatar.textContent = ''; // Remove a letra
+                navAvatar.textContent = ''; 
             }
         } else {
             previewAvatar.textContent = usuario.nome.charAt(0).toUpperCase();

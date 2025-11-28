@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const presencaController = require("../controllers/presencaController");
-const authMiddleware = require("../middlewares/authMiddleware"); // ⬅️ IMPORTANDO O CÓDIGO DE LOGIN/AUTENTICAÇÃO
+const authMiddleware = require("../middlewares/authMiddleware"); 
 
 
 router.get(

@@ -1,5 +1,3 @@
-// server/models/Frequencia.js
-
 const mongoose = require('mongoose');
 
 const FrequenciaSchema = new mongoose.Schema({
@@ -26,7 +24,6 @@ const FrequenciaSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    // Quem registrou a frequência (para auditoria)
     registradoPor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Usuario' 
