@@ -1302,3 +1302,58 @@ body {
         padding: 12px;
     }
 }
+/* --- Botões de Ação nos Cards (Eventos) --- */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.card-title {
+    margin: 0;
+    color: #3f51b5;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%; /* Deixa redondo */
+    border: 1px solid #eee;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #777;
+    font-size: 0.9em;
+}
+
+/* Efeito Hover (Mouse em cima) */
+.btn-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+/* Cores Específicas no Hover */
+.btn-icon.edit:hover {
+    background-color: #e3f2fd;
+    color: #2196F3; /* Azul */
+    border-color: #2196F3;
+}
+
+.btn-icon.delete:hover {
+    background-color: #ffebee;
+    color: #f44336; /* Vermelho */
+    border-color: #f44336;
+}

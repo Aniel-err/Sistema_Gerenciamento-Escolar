@@ -1,116 +1,191 @@
-document.addEventListener("DOMContentLoaded", carregarEventos);
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('token');
+    
+    const modal = document.getElementById('modalEvento');
+    const form = document.getElementById('formEvento');
+    const containerEventos = document.getElementById('eventos');
+    const modalTitle = document.getElementById('modalTitle');
+    
+    const btnNovo = document.getElementById('btnNovoEvento');
+    const btnClose = document.getElementById('closeModal');
+    const btnLimpar = document.getElementById('btnLimpar');
 
-async function api(url, metodo = "GET", corpo = null) {
-    const token = localStorage.getItem("token");
+    const idInput = document.getElementById('idEvento');
+    const tituloInput = document.getElementById('titulo');
+    const descInput = document.getElementById('descricao');
+    const inicioInput = document.getElementById('dataInicio');
+    const fimInput = document.getElementById('dataFim');
+    const localInput = document.getElementById('local');
+    const turmasInput = document.getElementById('turmas');
 
-    const config = {
-        method: metodo,
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        }
-    };
-
-    if (corpo) config.body = JSON.stringify(corpo);
-
-    const resposta = await fetch(url, config);
-
-    if (!resposta.ok) {
-        throw new Error("Erro: " + resposta.status);
+    function openModal() { 
+        modal.classList.add('show'); 
+    }
+    
+    function closeModal() { 
+        modal.classList.remove('show'); 
+        form.reset();
+        idInput.value = '';
+        modalTitle.textContent = "Criar Evento";
     }
 
-    return resposta.json();
-}
+    if (btnNovo) btnNovo.onclick = openModal;
+    if (btnClose) btnClose.onclick = closeModal;
+    if (btnLimpar) btnLimpar.onclick = closeModal;
 
-async function carregarEventos() {
-    try {
-        const eventos = await api("http://localhost:3000/eventos");
+    async function carregarEventos() {
+        try {
+            const res = await fetch('http://localhost:3000/eventos', {
+                headers: { 
+                    'Authorization': `Bearer ${token}` 
+                }
+            });
+            
+            if (!res.ok) throw new Error("Erro ao buscar eventos");
+            
+            const eventos = await res.json();
+            renderizarEventos(eventos);
 
-        console.log("Eventos carregados:", eventos);
+        } catch (err) { 
+            console.error(err);
+            containerEventos.innerHTML = '<p style="color:red; padding:20px;">Erro ao carregar eventos.</p>';
+        }
+    }
 
-        const lista = document.getElementById("eventos"); 
-        lista.innerHTML = "";
+    function renderizarEventos(eventos) {
+        containerEventos.innerHTML = '';
+
+        if (eventos.length === 0) {
+            containerEventos.innerHTML = '<p style="padding:20px; color:#666;">Nenhum evento agendado.</p>';
+            return;
+        }
 
         eventos.forEach(ev => {
-            const card = document.createElement("div");
-            card.classList.add("card");
+            const dataFormatada = new Date(ev.dataInicio).toLocaleString('pt-BR', { 
+                day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' 
+            });
 
+            const card = document.createElement('div');
+            card.className = 'card';
+            
             card.innerHTML = `
-                <h3>${ev.titulo}</h3>
-                <p>${ev.descricao || ""}</p>
-                <p><strong>Início:</strong> ${new Date(ev.dataInicio).toLocaleString()}</p>
-                <p><strong>Fim:</strong> ${ev.dataFim ? new Date(ev.dataFim).toLocaleString() : "—"}</p>
-                <p><strong>Local:</strong> ${ev.local || "—"}</p>
-                <p><strong>Turmas:</strong> ${ev.turmas?.join(", ")}</p>
+                <div class="card-header">
+                    <h3 class="card-title">${ev.titulo}</h3>
+                    
+                    <div class="card-actions">
+                        <button class="btn-icon edit" title="Editar">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        
+                        <button class="btn-icon delete" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
 
-                <button onclick="editar('${ev._id}')">Editar</button>
-                <button onclick="deletarEvento('${ev._id}')">Excluir</button>
+                <p style="font-size: 0.95em; color: #555; margin-bottom: 20px; line-height: 1.5;">
+                    ${ev.descricao || 'Sem descrição disponível.'}
+                </p>
+                
+                <div style="background: #f9f9f9; padding: 10px; border-radius: 8px;">
+                    <ul class="alerts-list" style="padding: 0; list-style: none; margin: 0;">
+                        <li style="margin-bottom: 8px; font-size: 0.9em;">
+                            <i class="fas fa-clock text-primary"></i> 
+                            <strong>Início:</strong> ${dataFormatada}
+                        </li>
+                        <li style="margin-bottom: 8px; font-size: 0.9em;">
+                            <i class="fas fa-map-marker-alt text-danger"></i> 
+                            <strong>Local:</strong> ${ev.local || 'Não definido'}
+                        </li>
+                        <li style="font-size: 0.9em;">
+                            <i class="fas fa-users text-success"></i> 
+                            <strong>Turmas:</strong> ${ev.turmas || 'Todas'}
+                        </li>
+                    </ul>
+                </div>
             `;
 
-            lista.appendChild(card);
+            const btnEdit = card.querySelector('.btn-icon.edit');
+            const btnDelete = card.querySelector('.btn-icon.delete');
+
+            btnEdit.onclick = () => editarEvento(ev);
+            btnDelete.onclick = () => deletarEvento(ev._id);
+
+            containerEventos.appendChild(card);
         });
-
-    } catch (erro) {
-        alert("Erro ao carregar eventos");
-        console.error(erro);
     }
-}
 
-document.getElementById("formEvento").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    const id = document.getElementById("idEvento").value;
+        const id = idInput.value;
+        const dados = {
+            titulo: tituloInput.value,
+            descricao: descInput.value,
+            dataInicio: inicioInput.value,
+            dataFim: fimInput.value,
+            local: localInput.value,
+            turmas: turmasInput.value 
+        };
 
-    const dados = {
-        titulo: document.getElementById("titulo").value,
-        descricao: document.getElementById("descricao").value,
-        dataInicio: document.getElementById("dataInicio").value,
-        dataFim: document.getElementById("dataFim").value,
-        local: document.getElementById("local").value,
-        turmas: document.getElementById("turmas").value.split(",").map(t => t.trim())
+        const url = id ? `http://localhost:3000/eventos/${id}` : 'http://localhost:3000/eventos';
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(dados)
+            });
+
+            if (res.ok) {
+                alert("Evento salvo com sucesso!");
+                closeModal();
+                carregarEventos();
+            } else {
+                const erro = await res.json();
+                alert(erro.mensagem || "Erro ao salvar.");
+            }
+        } catch (err) { 
+            console.error(err);
+            alert("Erro de conexão.");
+        }
+    });
+
+    window.editarEvento = (ev) => {
+        modalTitle.textContent = "Editar Evento";
+        idInput.value = ev._id;
+        tituloInput.value = ev.titulo;
+        descInput.value = ev.descricao || "";
+        localInput.value = ev.local || "";
+        turmasInput.value = ev.turmas || "";
+
+       
+        if(ev.dataInicio) inicioInput.value = ev.dataInicio.slice(0, 16);
+        if(ev.dataFim) fimInput.value = ev.dataFim.slice(0, 16);
+
+        openModal();
     };
 
-    try {
-        if (id)
-            await api(`http://localhost:3000/eventos/${id}`, "PUT", dados);
-        else
-            await api("http://localhost:3000/eventos", "POST", dados);
+    window.deletarEvento = async (id) => {
+        if(!confirm("Tem certeza que deseja apagar este evento?")) return;
 
-        carregarEventos();
-        document.getElementById("formEvento").reset();
-        document.getElementById("idEvento").value = "";
+        try {
+            const res = await fetch(`http://localhost:3000/eventos/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
 
-    } catch (erro) {
-        console.error(erro);
-        alert("Erro ao salvar evento");
-    }
+            if(res.ok) {
+                carregarEventos();
+            } else {
+                alert("Erro ao excluir.");
+            }
+        } catch (err) { console.error(err); }
+    };
+
+    carregarEventos();
 });
-
-window.editar = async function (id) {
-    try {
-        const ev = await api(`http://localhost:3000/eventos/${id}`);
-
-        document.getElementById("idEvento").value = ev._id;
-        document.getElementById("titulo").value = ev.titulo;
-        document.getElementById("descricao").value = ev.descricao || "";
-        document.getElementById("dataInicio").value = ev.dataInicio.slice(0, 16);
-        document.getElementById("dataFim").value = ev.dataFim ? ev.dataFim.slice(0, 16) : "";
-        document.getElementById("local").value = ev.local || "";
-        document.getElementById("turmas").value = ev.turmas?.join(",") || "";
-    } catch (erro) {
-        console.error(erro);
-        alert("Erro ao carregar evento");
-    }
-};
-
-window.deletarEvento = async function (id) {
-    if (!confirm("Deseja excluir?")) return;
-
-    try {
-        await api(`http://localhost:3000/eventos/${id}`, "DELETE");
-        carregarEventos();
-    } catch (erro) {
-        console.error(erro);
-        alert("Erro ao excluir evento");
-    }
-};
